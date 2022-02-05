@@ -3,3 +3,8 @@ O0/O2/O3
 SHORT-CIRCUIT
 Regular ver : 0,230s / 0,194s / 0,190s
 Optimized ver : 0,145s / 0,126s / 0,122s
+
+BOUNDS
+
+Slow: 0,326s / 0s / 0s
+Fast: 0,305s / 0s / 0s
