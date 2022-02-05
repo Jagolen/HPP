@@ -1,0 +1,6 @@
+5
+Milk 10.3
+Water 5.2
+Potatoes 3.1
+Carrots 4.8
+Meat 20.0

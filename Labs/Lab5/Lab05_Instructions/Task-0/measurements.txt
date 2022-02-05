@@ -1,0 +1,21 @@
+NO OPTIMIZATION / O2 / O3
+
+MALLOCYCODE
+real : 2,116s / 1,893s / 1,894s
+user : 1,633s / 1,591s / 1,562s
+sys : 0,450s / 0.216s / 0,240s
+
+REGULARCODE
+real : 1,641s / 0.370s /0,370s
+user : 1,456s / 0.362s /0,361s
+sys : 0,004s / 0s / 0s
+
+SLEEPYCODE
+real : 6,484s / 5,399s / 5,391s
+user : 1,451s / 0,377s / 0,372s
+sys : 0,004s / 0s / 0s
+
+THREADEDCODE
+real : 2,957s / 0,743s / 0,738s
+user : 2,886s / 0,721s / 0,722s
+sys : 0,002s / 0s / 0s

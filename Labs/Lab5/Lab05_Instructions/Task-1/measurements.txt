@@ -1,0 +1,33 @@
+RECORDED USER TIMES
+
+O0 / O2 / O3
+
+LOOP_INVARIANTS
+Slow : 1,012s / 0.197s / 0,181s
+Fast : 0,622s / 0,210s / 0,182s
+
+STRING_LOOP
+Slow : 1,029s / 0,348s / 0,534s
+Fast : 1,104s / 0,330s / 0,003s
+
+ARRAY_LOOP
+Slow : 0,725s / 0,269s / 0,001s
+Fast : 0,754s / 0,265s / 0.001s
+
+
+
+Loop invariant: Fast removes redundant i*N calculation over j, 
+it calculates it over i and then use that value over j leading
+to i calculations compared to i*j calculations in the slow version.
+Optimized version seems to take care of this problem se there fast and slow
+are the same
+
+String loop:
+While loop is a little faster than for loop, and pointer evaluation
+is slower than int evaluation, so for unoptimized, fast is slightly slower
+than slow because of the while loop. With optimization fast is much faster
+because of the integer comparison.
+
+Again, while is a little faster than for so for unoptimized, fast is
+a little slower than slow version. Since they both check ints,
+for optimized code they are the same. 

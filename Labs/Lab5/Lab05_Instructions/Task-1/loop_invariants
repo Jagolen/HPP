@@ -1,0 +1,194 @@
+	.file	"loop_invariants.c"
+# GNU C17 (Ubuntu 9.3.0-17ubuntu1~20.04) version 9.3.0 (x86_64-linux-gnu)
+#	compiled by GNU C version 9.3.0, GMP version 6.2.0, MPFR version 4.0.2, MPC version 1.1.0, isl version isl-0.22.1-GMP
+
+# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+# options passed:  -imultiarch x86_64-linux-gnu loop_invariants.c
+# -mtune=generic -march=x86-64 -auxbase-strip loop_invariants -O3
+# -fverbose-asm -fasynchronous-unwind-tables -fstack-protector-strong
+# -Wformat -Wformat-security -fstack-clash-protection -fcf-protection
+# options enabled:  -fPIC -fPIE -faggressive-loop-optimizations
+# -falign-functions -falign-jumps -falign-labels -falign-loops
+# -fassume-phsa -fasynchronous-unwind-tables -fauto-inc-dec
+# -fbranch-count-reg -fcaller-saves -fcode-hoisting
+# -fcombine-stack-adjustments -fcommon -fcompare-elim -fcprop-registers
+# -fcrossjumping -fcse-follow-jumps -fdefer-pop
+# -fdelete-null-pointer-checks -fdevirtualize -fdevirtualize-speculatively
+# -fdwarf2-cfi-asm -fearly-inlining -feliminate-unused-debug-types
+# -fexpensive-optimizations -fforward-propagate -ffp-int-builtin-inexact
+# -ffunction-cse -fgcse -fgcse-after-reload -fgcse-lm -fgnu-runtime
+# -fgnu-unique -fguess-branch-probability -fhoist-adjacent-loads -fident
+# -fif-conversion -fif-conversion2 -findirect-inlining -finline
+# -finline-atomics -finline-functions -finline-functions-called-once
+# -finline-small-functions -fipa-bit-cp -fipa-cp -fipa-cp-clone -fipa-icf
+# -fipa-icf-functions -fipa-icf-variables -fipa-profile -fipa-pure-const
+# -fipa-ra -fipa-reference -fipa-reference-addressable -fipa-sra
+# -fipa-stack-alignment -fipa-vrp -fira-hoist-pressure
+# -fira-share-save-slots -fira-share-spill-slots
+# -fisolate-erroneous-paths-dereference -fivopts -fkeep-static-consts
+# -fleading-underscore -flifetime-dse -floop-interchange
+# -floop-unroll-and-jam -flra-remat -flto-odr-type-merging -fmath-errno
+# -fmerge-constants -fmerge-debug-strings -fmove-loop-invariants
+# -fomit-frame-pointer -foptimize-sibling-calls -foptimize-strlen
+# -fpartial-inlining -fpeel-loops -fpeephole -fpeephole2 -fplt
+# -fpredictive-commoning -fprefetch-loop-arrays -free -freg-struct-return
+# -freorder-blocks -freorder-blocks-and-partition -freorder-functions
+# -frerun-cse-after-loop -fsched-critical-path-heuristic
+# -fsched-dep-count-heuristic -fsched-group-heuristic -fsched-interblock
+# -fsched-last-insn-heuristic -fsched-rank-heuristic -fsched-spec
+# -fsched-spec-insn-heuristic -fsched-stalled-insns-dep -fschedule-fusion
+# -fschedule-insns2 -fsemantic-interposition -fshow-column -fshrink-wrap
+# -fshrink-wrap-separate -fsigned-zeros -fsplit-ivs-in-unroller
+# -fsplit-loops -fsplit-paths -fsplit-wide-types -fssa-backprop
+# -fssa-phiopt -fstack-clash-protection -fstack-protector-strong
+# -fstdarg-opt -fstore-merging -fstrict-aliasing
+# -fstrict-volatile-bitfields -fsync-libcalls -fthread-jumps
+# -ftoplevel-reorder -ftrapping-math -ftree-bit-ccp -ftree-builtin-call-dce
+# -ftree-ccp -ftree-ch -ftree-coalesce-vars -ftree-copy-prop -ftree-cselim
+# -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-forwprop -ftree-fre
+# -ftree-loop-distribute-patterns -ftree-loop-distribution
+# -ftree-loop-if-convert -ftree-loop-im -ftree-loop-ivcanon
+# -ftree-loop-optimize -ftree-loop-vectorize -ftree-parallelize-loops=
+# -ftree-partial-pre -ftree-phiprop -ftree-pre -ftree-pta -ftree-reassoc
+# -ftree-scev-cprop -ftree-sink -ftree-slp-vectorize -ftree-slsr -ftree-sra
+# -ftree-switch-conversion -ftree-tail-merge -ftree-ter -ftree-vrp
+# -funit-at-a-time -funswitch-loops -funwind-tables -fverbose-asm
+# -fversion-loops-for-strides -fzero-initialized-in-bss
+# -m128bit-long-double -m64 -m80387 -malign-stringops
+# -mavx256-split-unaligned-load -mavx256-split-unaligned-store
+# -mfancy-math-387 -mfp-ret-in-387 -mfxsr -mglibc -mieee-fp
+# -mlong-double-80 -mmmx -mno-sse4 -mpush-args -mred-zone -msse -msse2
+# -mstv -mtls-direct-seg-refs -mvzeroupper
+
+	.text
+	.section	.rodata.str1.1,"aMS",@progbits,1
+.LC2:
+	.string	"slow"
+.LC5:
+	.string	"Done. sum = %15.3f\n"
+	.section	.text.startup,"ax",@progbits
+	.p2align 4
+	.globl	main
+	.type	main, @function
+main:
+.LFB39:
+	.cfi_startproc
+	endbr64	
+	pushq	%rbp	#
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+# loop_invariants.c:10:   double * data = (double*) malloc(N*N*sizeof(double));
+	movl	$1, %esi	#,
+	movl	$800000000, %edi	#,
+	call	calloc@PLT	#
+# /usr/include/x86_64-linux-gnu/bits/stdio2.h:107:   return __printf_chk (__USE_FORTIFY_LEVEL - 1, __fmt, __va_arg_pack ());
+	leaq	.LC2(%rip), %rdi	#,
+# loop_invariants.c:10:   double * data = (double*) malloc(N*N*sizeof(double));
+	movq	%rax, %rbp	# tmp132, data
+# /usr/include/x86_64-linux-gnu/bits/stdio2.h:107:   return __printf_chk (__USE_FORTIFY_LEVEL - 1, __fmt, __va_arg_pack ());
+	call	puts@PLT	#
+	movq	%rbp, %rsi	# data, ivtmp.22
+	movq	%rbp, %rdx	# data, ivtmp.43
+	xorl	%ecx, %ecx	# ivtmp.42
+	movdqa	.LC3(%rip), %xmm4	#, tmp130
+	movsd	.LC4(%rip), %xmm6	#, tmp131
+	movdqa	.LC0(%rip), %xmm5	#, vect_vec_iv_.8
+.L2:
+# loop_invariants.c:31:       data[i*N + j] += i*N/7.7 + j;
+	pxor	%xmm3, %xmm3	# tmp123
+	xorl	%eax, %eax	# ivtmp.28
+	movdqa	%xmm5, %xmm2	# vect_vec_iv_.8, vect_vec_iv_.8
+	cvtsi2sdl	%ecx, %xmm3	# ivtmp.42, tmp123
+	divsd	%xmm6, %xmm3	# tmp131, _12
+	unpcklpd	%xmm3, %xmm3	# vect_cst__23
+	.p2align 4,,10
+	.p2align 3
+.L3:
+	movdqa	%xmm2, %xmm0	# vect_vec_iv_.8, vect_vec_iv_.8
+# loop_invariants.c:31:       data[i*N + j] += i*N/7.7 + j;
+	movupd	16(%rdx,%rax), %xmm7	# MEM[base: vectp.10_46, index: ivtmp.28_9, offset: 16B], tmp133
+	paddd	%xmm4, %xmm2	# tmp130, vect_vec_iv_.8
+# loop_invariants.c:31:       data[i*N + j] += i*N/7.7 + j;
+	pshufd	$238, %xmm0, %xmm1	#, vect_vec_iv_.8, tmp116
+	cvtdq2pd	%xmm0, %xmm0	# vect_vec_iv_.8, vect__13.13
+	addpd	%xmm3, %xmm0	# vect_cst__23, vect__14.14
+	cvtdq2pd	%xmm1, %xmm1	# tmp116, vect__13.13
+	addpd	%xmm3, %xmm1	# vect_cst__23, vect__14.14
+# loop_invariants.c:31:       data[i*N + j] += i*N/7.7 + j;
+	addpd	%xmm7, %xmm1	# tmp133, vect__15.15
+	movupd	(%rdx,%rax), %xmm7	# MEM[base: vectp.10_46, index: ivtmp.28_9, offset: 0B], tmp134
+	addpd	%xmm7, %xmm0	# tmp134, vect__15.15
+	movups	%xmm1, 16(%rdx,%rax)	# vect__15.15, MEM[base: vectp.10_46, index: ivtmp.28_9, offset: 16B]
+	movups	%xmm0, (%rdx,%rax)	# vect__15.15, MEM[base: vectp.10_46, index: ivtmp.28_9, offset: 0B]
+	addq	$32, %rax	#, ivtmp.28
+	cmpq	$80000, %rax	#, ivtmp.28
+	jne	.L3	#,
+	addl	$10000, %ecx	#, ivtmp.42
+	addq	$80000, %rdx	#, ivtmp.43
+# loop_invariants.c:29:   for(i = 0; i<N; i++) {
+	cmpl	$100000000, %ecx	#, ivtmp.42
+	jne	.L2	#,
+	leaq	800000000(%rbp), %rax	#, _8
+# loop_invariants.c:36:   sum = 0;
+	pxor	%xmm0, %xmm0	# sum
+.L5:
+	movsd	(%rsi), %xmm1	# MEM[base: _6, offset: 0B], stmp_sum_32.7
+	addq	$16, %rsi	#, ivtmp.22
+	addsd	%xmm0, %xmm1	# sum, stmp_sum_32.7
+# loop_invariants.c:38:     sum += data[i];
+	movsd	-8(%rsi), %xmm0	# MEM[base: _6, offset: 0B], stmp_sum_32.7
+	addsd	%xmm1, %xmm0	# stmp_sum_32.7, sum
+	cmpq	%rsi, %rax	# ivtmp.22, _8
+	jne	.L5	#,
+# /usr/include/x86_64-linux-gnu/bits/stdio2.h:107:   return __printf_chk (__USE_FORTIFY_LEVEL - 1, __fmt, __va_arg_pack ());
+	leaq	.LC5(%rip), %rsi	#,
+	movl	$1, %edi	#,
+	movl	$1, %eax	#,
+	call	__printf_chk@PLT	#
+# loop_invariants.c:41:   free(data);
+	movq	%rbp, %rdi	# data,
+	call	free@PLT	#
+# loop_invariants.c:44: }
+	xorl	%eax, %eax	#
+	popq	%rbp	#
+	.cfi_def_cfa_offset 8
+	ret	
+	.cfi_endproc
+.LFE39:
+	.size	main, .-main
+	.section	.rodata.cst16,"aM",@progbits,16
+	.align 16
+.LC0:
+	.long	0
+	.long	1
+	.long	2
+	.long	3
+	.align 16
+.LC3:
+	.long	4
+	.long	4
+	.long	4
+	.long	4
+	.section	.rodata.cst8,"aM",@progbits,8
+	.align 8
+.LC4:
+	.long	3435973837
+	.long	1075760332
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",@progbits
+	.section	.note.gnu.property,"a"
+	.align 8
+	.long	 1f - 0f
+	.long	 4f - 1f
+	.long	 5
+0:
+	.string	 "GNU"
+1:
+	.align 8
+	.long	 0xc0000002
+	.long	 3f - 2f
+2:
+	.long	 0x3
+3:
+	.align 8
+4:
