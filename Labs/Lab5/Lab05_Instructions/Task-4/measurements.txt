@@ -25,3 +25,13 @@ Regular : 0,257s / 0,182s / 0,182s
 Optimized : 0,229s / 0,155s / 0,154s
 
 The values are correct after optimization
+
+MATH FUNCTIONS
+Pow : 1,838s / 1,847s / 1,849s
+Sqrt : 1,478s / 1,107s / 1,107s
+Sqrtf : 0,420s / 0,063s / 0,063s
+
+Pow is more generic than sqrt, so sqrt can be optimized for the
+special case when it's used, therefore it is faster. sqrtf forces
+the input, therefore it is faster than regular sqrt (which can take
+doubles)

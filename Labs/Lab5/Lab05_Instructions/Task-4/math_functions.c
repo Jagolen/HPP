@@ -7,11 +7,12 @@ int main(int argc, char **argv)
    float x;
    for (i=0; i<50000000; i++)
    {
-     x = pow(i, 0.5);
+     x = sqrtf(i);
+     
      /*
        Alternatives:
+       x = pow(i, 0.5);
        x = sqrt(i);
-       x = sqrtf(i);
      */
    }
    printf("%f\n", x);
