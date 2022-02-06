@@ -1,0 +1,16 @@
+Large or Small numbers
+
+Float becomes inf if larger than 1e38 ~ 2^126
+Double becomes inf if larger than 1e308 ~ 2^1023
+Operations with inf or NaN returns inf or NaN respectively.
+Addition of 1 with 1e-16 gives 1, which corresponds with the table.
+
+TIMECOMPARISONS done on "Trygger" machine
+O0/O2/O3/Ofast
+
+NORMS: 0,239s / 0,144s / 0,144s / 0,084s
+DENORMS: 4,794s / 3,780s / 3,776s / 0,084s
+
+RESULTS
+
+NORMS (In : 1e-35): 
