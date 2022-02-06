@@ -3,7 +3,7 @@
 
 /* From A. Fog: Example 14.1a. */
 
-#define FAST 0
+#define FAST 1
 
 #if FAST
 int factorial (int n)

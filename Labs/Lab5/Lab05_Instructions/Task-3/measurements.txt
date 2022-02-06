@@ -11,6 +11,13 @@ O0/O2/O3/Ofast
 NORMS: 0,239s / 0,144s / 0,144s / 0,084s
 DENORMS: 4,794s / 3,780s / 3,776s / 0,084s
 
-RESULTS
+RESULTS (Output)
 
-NORMS (In : 1e-35): 
+NORMS (In : 1e-35): 9.999999e-36 / same / same / same
+DENORMS (In : 1e-39): 9.999960e-40 / same / same / 0e+00
+
+Changing tiny to 1e-50 sets input and output to zero, thats because the
+smallest subnormal number is around 1.4e-45, so everything smaller than
+that gets flushed to zero. Tests with 1.401e-45 gave correct results and
+same time as the denorm measurements before but 0.5e-45 gave zero as in and
+output and same time as the norm measurements.

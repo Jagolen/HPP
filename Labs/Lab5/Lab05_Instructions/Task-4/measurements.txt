@@ -1,0 +1,27 @@
+TIMINGS
+
+O0 / O2 / O3
+
+MEMSET
+Slow : 0,196s / 0,050s / 0,010s (All gave diffFound = 0)
+Fast : 0,009s / 0,011s / 0,011s (All gave diffFound = 0)
+
+Optimization flags usually set the for loop to use the memset and
+memcpy functions so both version take the same time using O3.
+
+
+LOOKUP
+Slow : 0,371s / 0,095s / 0,072s (All gave myFact = 5040, i.e. 7!)
+Fast : 0,090s / 0,028s / 0,023s (All gave myFact = 5040, i.e. 7!)
+
+Slow version needs n-1 multiplications. Fast version is fast if the table 
+is in the cache, then we only need at most n reads from cache. If
+too many elements are needed and the list is flushed from cache, 
+the lookup method is slower, it's also slower if the function can
+be done in very few operations.
+
+STRENGTH REDUCTION
+Regular : 0,257s / 0,182s / 0,182s
+Optimized : 0,229s / 0,155s / 0,154s
+
+The values are correct after optimization
