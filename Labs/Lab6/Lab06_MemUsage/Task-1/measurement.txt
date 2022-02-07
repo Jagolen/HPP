@@ -1,0 +1,32 @@
+Wall times
+
+O0 / O2 / O3
+
+For N = 10 000
+Merge : 0,002s / 0,001s / 0,001s
+Bubble : 0,088s / 0,048s / 0,048s
+
+For N = 50 000
+Merge : 0,008s / 0,005s / 0,006s
+Merge (Memleak) : 
+Bubble : 1,499s / 0,736s / 0,735s
+
+For N = 100 000
+Merge : 0,017s / 0,011s / 0,012s
+Bubble : 5,645s / 2,687s / 2,694s
+
+TEST OF Merge
+
+For N = 100 000
+
+For N = 1 000 000
+2 Mallocs No leak : 0,159s / 0,095s / 0,112s
+2 Mallocs Leak : 0,178s / 0,113s / 0,127s
+1 Malloc : 0,142s / 0,075s / 0,090s
+On stack : 0,122s / 0,066s / 0,076s
+
+For N = 10 000 000
+2 Mallocs No leak : 1,745s / 0,992s / 1,147s
+2 Mallocs Leak : 1,913s / 1,180s / 1,317s
+1 Malloc : 1,516s / 0,774s / 0,928s
+On stack : Too big
