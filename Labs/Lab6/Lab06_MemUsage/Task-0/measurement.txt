@@ -1,0 +1,16 @@
+TIMINGS
+O0 / O2 / O3
+
+CACHETEST
+Modify with step 8 : 0,749s / 0,386s / 0,198s
+Modify Low : 0,614s / 0,147s / 0,062s
+
+Modify low modifies values in the same line, the modify with
+step 8 looks at different lines in the cache which must be imported
+therefore this should take longer, and it is also what we observe.
+
+By decreasing n and increasing m, we see a gradual improvement 
+from 100 to 64 with a min of 0,086s (some O3 times: n = 66 : 0,111s, 
+n = 70 : 0,154s, n = 80 : 0,187s).
+At n =64, I allocate 32768 bytes. Running lscpu i see that i have 
+L1d = L1i = 32 KiB which seems to match where the speed is at the fastest.
