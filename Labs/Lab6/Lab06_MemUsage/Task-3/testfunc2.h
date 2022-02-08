@@ -1,6 +1,6 @@
 
-void transform_opt (float * restrict dest, 
-		    const float * restrict src, 
-		    const float * restrict params, 
+void transform_opt (float * dest, 
+		    const float * src, 
+		    const float * params, 
 		    int n);
 

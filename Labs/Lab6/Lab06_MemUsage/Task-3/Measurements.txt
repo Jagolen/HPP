@@ -15,7 +15,8 @@ transform_std : 2,356s / 0,539s / 0,200s
 transform_ops : 2,466s / 0,538s / 0,200s
 
 Restrict in transform_ops
-transform_std : 2,402s / 0,539s / 0,200s
-transform_ops : 2,465s / 0,539s / 0,200s
+transform_std : 2,358s / 0,539s / 0,200s
+transform_ops : 2,417s / 0,539s / 0,200s
 
-Restrict does not seem to make a difference.
+Restrict does not seem to make a difference. I also ran the test on the
+"Arrhenius" linux machine and there was no difference there either.

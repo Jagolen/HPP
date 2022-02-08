@@ -14,7 +14,7 @@ static double get_wall_seconds() {
 
 int main (int argc, char**args) {
   double time1;
-  const int N = 5000;
+  const int N = 10000;
   const int nJobs = 1;
 
   double* A     = (double*)malloc(N*N*sizeof(double));

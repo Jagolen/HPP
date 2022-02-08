@@ -1,0 +1,10 @@
+O0 / O2 / O3 / Function calls
+
+Regular ver: 2,317s / 2,298s / 2,293s / 400 000 000 calls
+f(i) outside j loop : 0,362s / 0,000s / 0,000s / 20 000 calls
+Declaring pure : 0,352s / 0,000s / 0,000s / 20 000 calls
+Moving fun into main : 2,320s / 2,295s / 0,094s / 400 000 000 calls
+
+Moving the function into main makes it possible for the compiler to do
+fucntion inlining and unrolling of the loop. This speeds up the program,
+but no fewer calls are made.

@@ -75,6 +75,96 @@ void mul_jik(int n, int **a, int **b, int **c)
   }
 }
 
+/* kji */
+void mul_kji(int n, int **a, int **b, int **c)
+{
+  int i, j, k;
+  for (k=0; k<n; k++) {
+    for (j=0; j<n; j++) {
+      int sum = 0;
+      for (i=0; i<n; i++)
+	sum += a[i][k] * b[k][j];
+      c[i][j] = sum;
+    }
+  }
+}
+
+/* jki */
+void mul_jki(int n, int **a, int **b, int **c)
+{
+  int i, j, k;
+  for (j=0; j<n; j++) {
+    for (k=0; k<n; k++) {
+      int sum = 0;
+      for (i=0; i<n; i++)
+	sum += a[i][k] * b[k][j];
+      c[i][j] = sum;
+    }
+  }
+}
+
+/* ikj */
+void mul_ikj(int n, int **a, int **b, int **c)
+{
+  int i, j, k;
+  for (i=0; i<n; i++) {
+    for (k=0; k<n; k++) {
+      int sum = 0;
+      for (j=0; j<n; j++)
+	sum += a[i][k] * b[k][j];
+      c[i][j] = sum;
+    }
+  }
+}
+
+/* ikj optimized */
+void mul_ikj_optim(int n, int **a, int **b, int **c){
+  int i,j,k;
+  const int blockSz = 500;
+  if(n % blockSz != 0) {
+    printf("Error: n not divisible by blockSz.\n");
+    return;
+  }
+  int bi, bk;
+  for(i=0;i<n;i+=blockSz){
+    for(k=0;k<n;k+=blockSz){
+      for(bi = i; bi<i+blockSz;bi++){
+        for(bk = k; bk<k+blockSz;bk++){
+          int x = a[bi][bk];
+          for(j=0;j<n;j++) c[bi][j] +=  x*b[bk][j];
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+/* void mul_ikj_optim(int n, int **a, int **b, int **c){
+  const int blockSz = 300;
+  double SubMat[blockSz*blockSz];
+  if(n % blockSz != 0) {
+    printf("Error: N not divisible by blockSz.\n");
+    return;
+  }
+  int nBlocks = n / blockSz;
+  int i,j,k,bi,bk;
+  for(bi = 0; bi<nBlocks; bi++){
+    int istart = bi*blockSz;
+    for(bk = 0; bk<nBlocks; bk++){
+      int kstart = bk*blockSz;
+      for(i = 0; i<blockSz; i++){
+        for(k = 0; k<blockSz; k++){
+          int sum = a[bi][bk];
+          for(j = 0; j<n;j++) c[istart+i][j] += sum*b[kstart+k][j];
+        }
+      }
+    }
+  }
+}
+ */
 int main()
 {
   int i, j, n;
@@ -104,7 +194,7 @@ int main()
 
   allocate_mem(&c, n);
 
-  time=get_wall_seconds();
+ /*  time=get_wall_seconds();
   mul_kij(n, a, b, c);
   time=get_wall_seconds()-time;
   printf("Version kij, time = %f\n",time);
@@ -115,7 +205,23 @@ int main()
   time=get_wall_seconds();
   mul_jik(n, a, b, c);
   time=get_wall_seconds()-time;
-  printf("Version jik, time = %f\n",time);
+  printf("Version jik, time = %f\n",time); */
+  time=get_wall_seconds();
+  mul_ikj_optim(n, a, b, c);
+  time=get_wall_seconds()-time;
+  printf("Version ikj optimized, time = %f\n",time);
+  /* time=get_wall_seconds();
+  mul_kji(n, a, b, c);
+  time=get_wall_seconds()-time;
+  printf("Version kji, time = %f\n",time);
+  time=get_wall_seconds();
+  mul_jki(n, a, b, c);
+  time=get_wall_seconds()-time;
+  printf("Version jki, time = %f\n",time);
+  time=get_wall_seconds();
+  mul_ikj(n, a, b, c);
+  time=get_wall_seconds()-time;
+  printf("Version ikj, time = %f\n",time);*/
 
   /*
     printf("Product of entered matrices:\n");

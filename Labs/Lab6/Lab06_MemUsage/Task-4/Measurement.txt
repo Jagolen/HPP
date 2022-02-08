@@ -1,0 +1,33 @@
+O0 / O2 / O3
+
+No restrict
+transform_std : 0,807s / 0,186s / 0,334s
+transform_ops : 0,819s / 0,184s / 0,332s
+
+Restrict
+transform_std : 0,821s / 0,187s / 0,334s
+transform_ops : 0,810s / 0,185s / 0,257s
+
+Change from np to NP in j - loop (Keeping restrict)
+transform_std : 0,799s / 0,187s / 0,334s
+transform_ops : 0,815s / 0,185s / 0,257s
+
+Adding const to NP
+transform_std : 0,808s / 0,187s / 0,335s
+transform_ops : 0,798s / 0,093s / 0,028s
+
+Moving NP inside transform_ops
+
+With const
+transform_std : 0,808s / 0,187s / 0,335s
+transform_ops : 0,798s / 0,093s / 0,028s
+
+Without const
+transform_std : 0,801s / 0,187s / 0,335s
+transform_ops : 0,798s / 0,092s / 0,028s
+
+We see a huge improvement in transform_ops if O3-optimization is used.
+Changing from np to NP did nothing but adding const to NP lead to a huge
+improvement in speed. Moving NP into the function, the speed was the same
+with or without const, the function sees that the value is never changed
+so it is marked as a constant even without the declaration.

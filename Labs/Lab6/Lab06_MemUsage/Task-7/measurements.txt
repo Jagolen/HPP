@@ -1,0 +1,25 @@
+O0 / O2 / O3
+
+N = 1000
+kij : 2,362s / 0,498s / 0,166s
+ijk : 2,090s / 0,752s / 0,747s
+jik : 1,983s / 0,652s / 0,652s
+ikj : 1,538s / 0,256s / 0,137s
+
+Notice that the permutations ending in j are the fastest, since
+we walk over j in our sum, som moving over j means moving over
+the elements adjacent in the cache. Similarly ikj is faster than kij
+since k is at the innest loop in the line above.
+
+O3 measurements of big matrices
+
+N = 5000
+Not blocked : 25,162s
+Blocked Size 50 : 20,347s
+Blocked Size 100 : 19,449s
+Blocked size 125 : 19,435s
+Blocked size 200 : 19,365s
+Blocked size 250 : 19,286s
+Blocked size 500 : 20,028s
+
+Block size of 250 appears to be optimal
