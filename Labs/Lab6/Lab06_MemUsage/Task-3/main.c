@@ -15,7 +15,7 @@ static double get_wall_seconds() {
 int main (int argc, char**args) {
 
   // Prepare input and output buffers for tests
-  const int N1 = 10000;
+  const int N1 = 20;
   float* srcdata  = (float*)malloc(N1*sizeof(float));
   float* dstdata1 = (float*)malloc(N1*sizeof(float));
   float* dstdata2 = (float*)malloc(N1*sizeof(float));
@@ -26,7 +26,7 @@ int main (int argc, char**args) {
   params[0] = 1.3;
   params[1] = 1.9;
 
-  int N2 = 80000;
+  int N2 = 50000000;
   double time1;
 
   // Run both transform_std and transform_opt without timing

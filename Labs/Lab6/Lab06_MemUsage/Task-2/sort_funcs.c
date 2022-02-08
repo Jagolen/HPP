@@ -19,6 +19,7 @@ void merge_sort(intType* list_to_sort, int N) {
     // Only one element, no sorting needed. Just return directly in this case.
     return;
   }
+  if(N<1000) return bubble_sort(list_to_sort,N);
   int n1 = N / 2;
   int n2 = N - n1;
   // Allocate new lists

@@ -1,0 +1,21 @@
+O0 / O2 / O3
+
+N1 = 10 000, N2 = 80 000
+No restrict
+transform_std : 1,694s / 0,395s / 0,098s
+transform_ops : 1,760s / 0,395s / 0,098s
+
+Restrict in transform_ops
+transform_std : 1,761s / 0,393s / 0,098s
+transform_ops : 1,761s / 0,393s / 0,098s
+
+N1 = 20, N2 = 50 000 000
+No restrict
+transform_std : 2,356s / 0,539s / 0,200s
+transform_ops : 2,466s / 0,538s / 0,200s
+
+Restrict in transform_ops
+transform_std : 2,402s / 0,539s / 0,200s
+transform_ops : 2,465s / 0,539s / 0,200s
+
+Restrict does not seem to make a difference.

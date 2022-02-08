@@ -1,0 +1,17 @@
+If there's no deftype, the compiler complains that it expected declaration
+specifiers.
+
+O0 / O2 / O3
+
+TYPE IN INTTYPE (N = 10 000 000)
+Long long : 6,941s / 3,836s / 3,882s
+Long int : 6,945s / 3,827s / 3,882s
+Int : 6,661s / 3,709s / 3,707s
+Short int : 6,888s / 3,789s / 3,710s
+Char : 6,759s / 3,699s / 3,659s
+
+Int is faster because the cpu can then work at its native word size (32-bit)
+The rest are faster with reduced amount of bits.
+
+If we used int type for everything we would get problems with overflow,
+for example if we used char for n.

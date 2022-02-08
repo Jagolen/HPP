@@ -1,6 +1,6 @@
 CC = gcc
 LD = gcc
-CFLAGS = -O3 -Wall -Werror
+CFLAGS = -Wall -Werror
 LDFLAGS = 
 RM = /bin/rm -f
 OBJS = main.o sort_funcs.o
