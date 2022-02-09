@@ -1,0 +1,55 @@
+Unit growth for small function inlining: 0->0 (0%)
+
+Inlined 0 calls, eliminated 0 functions
+
+matvec.c:20:5: missed: couldn't vectorize loop
+matvec.c:22:45: missed: failed: evolution of base is not affine.
+matvec.c:21:17: missed: couldn't vectorize loop
+matvec.c:22:34: missed: not vectorized: complicated access pattern.
+matvec.c:20:5: missed: couldn't vectorize loop
+matvec.c:22:45: missed: failed: evolution of base is not affine.
+matvec.c:21:17: missed: couldn't vectorize loop
+matvec.c:22:34: missed: not vectorized: complicated access pattern.
+matvec.c:44:5: missed: couldn't vectorize loop
+matvec.c:44:5: missed: not vectorized: control flow in loop.
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:107:10: missed: statement clobbers memory: __printf_chk (1, "e_sum: %f\n", prephitmp_58);
+matvec.c:59:3: missed: couldn't vectorize loop
+matvec.c:60:26: missed: statement clobbers memory: _7 = malloc (_2);
+matvec.c:58:20: missed: statement clobbers memory: _3 = malloc (_2);
+matvec.c:60:26: missed: statement clobbers memory: _7 = malloc (_2);
+matvec.c:66:3: missed: couldn't vectorize loop
+matvec.c:67:5: missed: statement clobbers memory: free (_4);
+matvec.c:67:5: missed: statement clobbers memory: free (_4);
+matvec.c:68:3: missed: statement clobbers memory: free (arr_9(D));
+matvec.c:76:3: missed: couldn't vectorize loop
+matvec.c:78:23: missed: statement clobbers memory: _8 = drand48 ();
+matvec.c:77:5: missed: couldn't vectorize loop
+matvec.c:78:23: missed: statement clobbers memory: _8 = drand48 ();
+matvec.c:78:23: missed: statement clobbers memory: _8 = drand48 ();
+matvec.c:79:18: missed: statement clobbers memory: _12 = drand48 ();
+matvec.c:20:5: missed: couldn't vectorize loop
+matvec.c:22:45: missed: failed: evolution of base is not affine.
+matvec.c:21:17: missed: couldn't vectorize loop
+matvec.c:22:34: missed: not vectorized: complicated access pattern.
+matvec.c:30:5: missed: couldn't vectorize loop
+matvec.c:32:45: missed: failed: evolution of base is not affine.
+matvec.c:31:17: missed: couldn't vectorize loop
+matvec.c:32:34: missed: not vectorized: complicated access pattern.
+matvec.c:94:5: missed: statement clobbers memory: allocate_mat (&a, 16384);
+matvec.c:95:16: missed: statement clobbers memory: b_10 = malloc (131072);
+matvec.c:96:16: missed: statement clobbers memory: c_12 = malloc (131072);
+matvec.c:97:16: missed: statement clobbers memory: d_14 = malloc (131072);
+matvec.c:98:5: missed: statement clobbers memory: init_matvec (a.1_1, b_10, c_12, d_14, 16384);
+matvec.c:9:3: missed: statement clobbers memory: gettimeofday (&tv, 0B);
+matvec.c:9:3: missed: statement clobbers memory: gettimeofday (&tv, 0B);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:107:10: missed: statement clobbers memory: __printf_chk (1, "Ref: time = %f\n", time1_16);
+matvec.c:9:3: missed: statement clobbers memory: gettimeofday (&tv, 0B);
+matvec.c:9:3: missed: statement clobbers memory: gettimeofday (&tv, 0B);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:107:10: missed: statement clobbers memory: __printf_chk (1, "Auto-vec: time = %f\n", time2_17);
+matvec.c:109:9: missed: statement clobbers memory: _4 = verify_result (c_12, d_14, 16384);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:107:10: missed: statement clobbers memory: __builtin_puts (&"OK"[0]);
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:107:10: missed: statement clobbers memory: __builtin_puts (&"MISMATCH"[0]);
+matvec.c:113:5: missed: statement clobbers memory: free_mat (a.4_5, 16384);
+matvec.c:114:5: missed: statement clobbers memory: free (b_10);
+matvec.c:114:13: missed: statement clobbers memory: free (c_12);
+matvec.c:114:21: missed: statement clobbers memory: free (d_14);

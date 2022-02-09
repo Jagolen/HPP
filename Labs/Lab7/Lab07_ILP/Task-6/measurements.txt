@@ -1,0 +1,10 @@
+Running the code by default the loop can not be auto vectorized.
+
+Ref-Time : 0,212s
+Autovec-time : 0,213s
+
+Making the loop autovectorized and using flags ffast math
+and march-native gives following time:
+
+Ref-Time : 0,211s
+Autovec-time : 0,091s
