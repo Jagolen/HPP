@@ -1,0 +1,12 @@
+O0 / O2 / O3
+
+N = 200
+f_std : 1,771s / 0,516s / 0,276s
+f_opt no unroll : 1,777s / 0,516s / 0,275s
+f_opt unroll 2 : 1,582s / 0,280s / 0,274s
+f_opt unroll 3 : 1,632s / 0,253s / 0,170s
+f_opt unroll 4 : 1,491s / 0,249s / 0,169s
+f_opt unroll 5 : 1,536s / 0,257s / 0,179s
+f_opt w flag : : 1,775s / 0,302s / 0,160s
+
+f_ops w flag means having the defaul f_ops and compiling with -funroll-loops

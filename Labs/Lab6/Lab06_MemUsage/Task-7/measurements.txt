@@ -13,6 +13,15 @@ since k is at the innest loop in the line above.
 
 O3 measurements of big matrices
 
+
+N = 4000
+Not blocked : 12,599s
+Blocked size 100 : 10,356s
+Blocked size 160 : 9,792s
+Blocked size 200 : 9,776s
+Blocked size 250 : 9,796s
+Blocked size 400 : 9,871s
+
 N = 5000
 Not blocked : 25,162s
 Blocked Size 50 : 20,347s
@@ -22,4 +31,4 @@ Blocked size 200 : 19,365s
 Blocked size 250 : 19,286s
 Blocked size 500 : 20,028s
 
-Block size of 250 appears to be optimal
+Block size of 200 - 250 appears to be optimal

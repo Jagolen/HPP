@@ -1,0 +1,12 @@
+O0 / O2 / O3
+
+f_std : 1,723s / 0,441s / 0,466s
+f_ops unoptim : 1,816s / 0,443s / 0,466s
+f_ops optim : 1,268s / 0,230s / 0,165s
+f_ops w flag : 1,815s / 0,368s / 0,367s
+
+
+f_ops optim means loopunrolling by 4 and remove the counter and if-statement.
+We first calculate i, i+1, i+2, i+3 and then increment x and go into the next loop.
+
+f_ops w flag means having the defaul f_ops and compiling with -funroll-loops

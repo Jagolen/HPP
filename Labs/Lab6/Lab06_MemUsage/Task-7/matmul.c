@@ -120,7 +120,7 @@ void mul_ikj(int n, int **a, int **b, int **c)
 /* ikj optimized */
 void mul_ikj_optim(int n, int **a, int **b, int **c){
   int i,j,k;
-  const int blockSz = 500;
+  const int blockSz = 400;
   if(n % blockSz != 0) {
     printf("Error: n not divisible by blockSz.\n");
     return;
