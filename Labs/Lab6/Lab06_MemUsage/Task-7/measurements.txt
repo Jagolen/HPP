@@ -31,4 +31,4 @@ Blocked size 200 : 19,365s
 Blocked size 250 : 19,286s
 Blocked size 500 : 20,028s
 
-Block size of 200 - 250 appears to be optimal
+Block size of 200 - 250 appears to be optimal ~2mb

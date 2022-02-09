@@ -1,4 +1,4 @@
-#define STENCIL_SZ 20
+#define STENCIL_SZ 4
 
 typedef struct {
   double x;

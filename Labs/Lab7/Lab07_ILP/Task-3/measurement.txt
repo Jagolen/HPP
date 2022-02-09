@@ -1,0 +1,13 @@
+O0 / O2 / O3
+
+StencilSz = 20
+
+stencil_v1 : 3,463s / 0,549s / 0,511s
+stencil_v2 no optim : 3,456s / 0,549s / 0,512s
+stencil_v2 w loop fusion : 3,416s / 0,492s / 0,492s
+
+StencilSz = 4
+
+stencil_v1 : 0,677s / 0,075s / 0,043s
+stencil_v2 no optim : 0,678s / 0,076s / 0,043s
+stencil_v2 w loop fusion : 0,653s / 0,060s / 0,043s

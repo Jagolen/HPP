@@ -1,6 +1,6 @@
 CC = gcc
 LD = gcc
-CFLAGS = -O3 -Wall
+CFLAGS = -O2 -Wall
 LDFLAGS = 
 RM = /bin/rm -f
 OBJS = main.o stencil.o

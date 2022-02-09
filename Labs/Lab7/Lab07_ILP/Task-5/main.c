@@ -18,7 +18,7 @@ int main (int argc, char**args) {
   double* a  = (double*)malloc(N1*sizeof(double));
   int i, j;
   for(i = 0; i < N1; i++)
-    a[i] = (rand() % 1000) * 0.001;
+    a[i] = (rand() % 500) * 0.001;
 
   int N2 = 20000;
   double time1;

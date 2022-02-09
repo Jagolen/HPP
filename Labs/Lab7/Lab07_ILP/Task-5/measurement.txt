@@ -1,0 +1,17 @@
+O0 / O2 O3
+
+a[i] values between 0 and 1
+f_std : 1,143s / 0,334s / 0,354s
+f_opt : 1,128s / 0,334s / 0,286s
+
+a[i] values between 0 and 0.5
+f_std : 0,665s / 0,196s / 0,195s
+f_opt : 0,664s / 0,196s / 0,196s
+
+Measurements from task 4:
+f_std : 1,149s / 0,329s / 0,346s
+f_ops regular : 1,122s / 0,330s / 0,286s
+f_ops no ifs : 0,587s / 0,144s / 0,143s
+
+We see that branch prediction where the outcome is nearly always the same
+can double the speed, but manual optimization is faster.
