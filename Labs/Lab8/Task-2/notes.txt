@@ -1,0 +1,3 @@
+Void pointer is cast to double pointer with double* ptr = (double*) arg;
+By having different inputs to the function as two different threads, I can see that the correct
+arrays gets printed out by the two threads.

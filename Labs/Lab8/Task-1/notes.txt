@@ -1,0 +1,45 @@
+Printf statements in threads prints out when pthread_join is called when no work needs to be done.
+With work added to main and the thread function, we see that the main thread starts work first,
+then the threadfunction starts work. If both have the same amount of work, the main will finish
+first, and then the thread function. Regardless, we see that both threads are working 
+simultainiously!
+
+If more work in thread function:
+
+This is the main() function starting.
+the main() function now calling pthread_create().
+This is the main() function after pthread_create()
+Main starting to do some work!
+The thread function is starting doing some work
+Result of work done in main(): sum = 99.999998
+the main() function now calling pthread_join().
+Result of work done in the thread function: sum2 = 1999.999758
+
+More work in main:
+
+This is the main() function starting.
+the main() function now calling pthread_create().
+This is the main() function after pthread_create()
+Main starting to do some work!
+The thread function is starting doing some work
+Result of work done in the thread function: sum2 = 199.999997
+Result of work done in main(): sum = 999.999879
+the main() function now calling pthread_join().
+
+if I look in top, i see 200.0% cpu usage. (I have 4 cores with 1 thread each)
+
+Adding another thread fucntion, calling it with pthread_create and joining it with pthread_join,
+I get the following:
+
+This is the main() function starting.
+the main() function now calling pthread_create().
+This is the main() function after pthread_create()
+Main starting to do some work!
+The thread function B is starting doing some work
+The thread function A is starting doing some work
+Result of work done in main(): sum = 999.999879
+the main() function now calling pthread_join().
+Result of work done in the thread function A: sum2 = 1999.999758
+Result of work done in the thread function B: sum3 = 3000.000101
+
+Running top, i see 299,7% cpu usage, so all three threads are being run.
