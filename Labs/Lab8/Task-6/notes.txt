@@ -1,0 +1,10 @@
+Timings Primes under 300 000
+0 threads : 5,394s
+1 thread : 2,728s
+2 threads : 2,720s
+3 threads : 1,384s
+4 threads : 1,384s
+5 threads : 1,396s
+
+Since i only have 4 cores, 3+ threads should not speed up the code. Using 4 threads
+(main+3) instead of only the main thread, i see that it only takes 25,6% of the time.

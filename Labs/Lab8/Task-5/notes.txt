@@ -1,0 +1,2 @@
+Some threads seems to naturally be faster than others, i.e. if i create 10 threads, they
+do not print from thread 0 to thread 9.

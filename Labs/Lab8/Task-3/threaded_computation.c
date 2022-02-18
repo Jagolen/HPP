@@ -1,8 +1,16 @@
 #include <stdio.h>
 #include <pthread.h>
+#include <sys/time.h>
 
-const long int N1 = 700000000;
-const long int N2 = 100000000;
+const long int N1 = 400000000;
+const long int N2 = 400000000;
+
+static double get_wall_seconds() {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  double seconds = tv.tv_sec + (double)tv.tv_usec / 1000000;
+  return seconds;
+}
 
 void* the_thread_func(void* arg) {
   long int i;
@@ -20,7 +28,7 @@ int main() {
   printf("This is the main() function starting.\n");
 
   long int thread_result_value = 0;
-
+  double tottime = get_wall_seconds();
   /* Start thread. */
   pthread_t thread;
   printf("the main() function now calling pthread_create().\n");
@@ -36,9 +44,10 @@ int main() {
   /* Wait for thread to finish. */
   printf("the main() function now calling pthread_join().\n");
   pthread_join(thread, NULL);
-
+  tottime = get_wall_seconds()-tottime;
   printf("sum computed by main() : %ld\n", sum);
   printf("sum computed by thread : %ld\n", thread_result_value);
+  printf("time taken : %lf\n",tottime);
   long int totalSum = sum + thread_result_value;
   printf("totalSum : %ld\n", totalSum);
 

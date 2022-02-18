@@ -1,0 +1,4 @@
+Primes under 300 000
+
+Serial program (naive approach) : 5,381s
+Parallell program (naive approach) : 2,711s

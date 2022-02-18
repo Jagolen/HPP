@@ -1,0 +1,4 @@
+Time N1 = 700 000 000, N2 = 100 000 000 : 0,372s
+Time N1 = 400 000 000, N2 = 400 000 000 : 0,213s
+
+The result stayed the same
