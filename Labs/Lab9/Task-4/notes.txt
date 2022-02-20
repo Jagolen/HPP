@@ -1,0 +1,15 @@
+Synch
+
+With the barrier in place, the program waits untill all threads have printed hello
+world, then let's the threads print bye world. Without the barrier, the
+program would simply print hello world/bye world when it cans, so "hello world"'s
+are interlaced with "bye world"'s.
+
+Spinwait
+
+With no optimization, the output is as expected, first all hello world, then all
+bye bye world. Using O3 optimization, the program prints all hello worlds, then it 
+gets stuck after the first bye bye world. This is fixed by adding the volatile keyword
+to the state variable. This basically tells the compiler to not optimize
+anything that interacts with that variable. It doesn't cache the variable but
+instead takes it from the main memory.

@@ -1,0 +1,3 @@
+In order to move the data, we first have to cast out pointers as void, inside and outside
+the thread function. Then we can recast the pointer as we want in main. Freeing allocated memory
+worked well, as well as calling pthread_exit() instead of return. No errors in valgrind.

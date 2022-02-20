@@ -1,0 +1,5 @@
+Setting the attribute to detached, the program gives error code 22, by removing the join call,
+the threads finishes their calculations. By not calling exit, the program doesn't wait for
+the threads to finish but simply ends before we get the result. The advantage of a detached
+thread seems to be if you don't need to join the result with main, so you don't have to wait
+for the thread to finish while the main thread is doing work.

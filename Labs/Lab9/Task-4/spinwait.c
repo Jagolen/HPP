@@ -5,7 +5,7 @@
 
 pthread_mutex_t lock;
 int waiting = 0;
-int state = 0;
+int volatile state = 0;
 
 void barrier() {
   int mystate;

@@ -1,0 +1,18 @@
+In the loop, we check if doitnow is zero, if it is then we lock the mutex, then when doitnow
+is 1, we signal the condition to wake up. The function will go through the loop, and since
+doitnow is 1, won't lock it again. It then exits the loop. Using top, we see that we only use
+100% of the cpu, without the condition it was 200%
+
+TIME
+
+Without condition:
+real	0m5,843s
+user	0m11,680s
+sys	    0m0,004s
+
+With condition:
+real	0m5,750s
+user	0m5,750s
+sys	    0m0,000s
+
+If we don't call pthread_cond_signal, the thread won't wake up and the program gets stuck

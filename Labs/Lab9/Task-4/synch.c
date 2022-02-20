@@ -27,7 +27,7 @@ void barrier() {
 void* HelloWorld(void* arg) {
   long id=(long)arg;
   printf("Hello World! %ld\n", id);
-  barrier();
+//  barrier();
   printf("Bye Bye World! %ld\n", id);
   return NULL;
 }
