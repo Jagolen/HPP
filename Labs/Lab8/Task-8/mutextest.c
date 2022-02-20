@@ -4,12 +4,13 @@
 
 long int sum = 0;
 int N = 100000;
+pthread_mutex_t mutextest;
 
 void* the_thread_func(void* arg) {
-
+  pthread_mutex_lock(&mutextest);
   for(int i = 1; i <= N; ++i)
   	sum += 1;
-
+  pthread_mutex_unlock(&mutextest);
   return NULL;
 }
 
@@ -24,6 +25,7 @@ int main(int argc, char **argv) {
   /* Start thread. */
   printf("the main() function now calling pthread_create().\n");
   pthread_t threads[N];
+  pthread_mutex_init(&mutextest,NULL);
   for(int i = 0; i < N; i++)
     pthread_create(&threads[i], NULL, the_thread_func, NULL);
 
@@ -36,6 +38,6 @@ int main(int argc, char **argv) {
     pthread_join(threads[i], NULL);
 
   printf("sum = %ld\n", sum); 
-
+  pthread_mutex_destroy(&mutextest);
   return 0;
 }

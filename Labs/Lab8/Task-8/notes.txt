@@ -1,0 +1,5 @@
+While running the code, we get a different sum each time. By adding a global mutex variable
+initializing it in main, and locking it in the thread function, only one thread gets access to 
+the sum loop. Then, the thread unlocks the sum loop and the next thread gets access and so on.
+Then the threads are joined and the mutex is destroyed. With this I got the same result each
+time.
