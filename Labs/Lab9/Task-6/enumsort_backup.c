@@ -18,19 +18,16 @@ static double get_wall_seconds() {
 }
 
 double indata[len], outdata[len];
-int len_per_thread = len/NUM_THREADS;
 
 void *findrank(void *arg)
 {
 	int rank,i;
-	long in =(long)arg;
-	for(int j = in; j<(in+len_per_thread);j++){
-    	rank=0;
-	  for (i=0;i<len;i++)
-		  if (indata[i]<indata[j]) rank++;
-	  outdata[rank]=indata[j];
-  }
-
+	long j=(long)arg;
+	
+	rank=0;
+	for (i=0;i<len;i++)
+		if (indata[i]<indata[j]) rank++;
+	outdata[rank]=indata[j];
 	pthread_exit(NULL);
 }
 
@@ -39,7 +36,7 @@ int main(int argc, char *argv[]) {
 	
   pthread_t threads[NUM_THREADS];
   pthread_attr_t attr;
-  int i, t;
+  int i, j, t;
   long el;
   void *status;
   
@@ -54,14 +51,15 @@ int main(int argc, char *argv[]) {
 
   // Enumeration sort
   double startTime = get_wall_seconds();
-
+  for (j=0;j<len;j+=NUM_THREADS)
+    {
 		for(t=0; t<NUM_THREADS; t++) {
-			el= len_per_thread*t;
+			el=j+t;
 		    pthread_create(&threads[t], &attr, findrank, (void *)el); }
 		
 		for(t=0; t<NUM_THREADS; t++) 
 			pthread_join(threads[t], &status);
-
+    }
   double timeTaken = get_wall_seconds() - startTime;
   printf("Time: %f  NUM_THREADS: %d\n", timeTaken, NUM_THREADS);
 

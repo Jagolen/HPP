@@ -1,0 +1,27 @@
+Serial code
+
+PI is approx. 3.1415926535899894
+
+real	0m0,546s
+user	0m0,537s
+sys	    0m0,009s
+
+
+Paralell code
+
+PI is approx. 3.1415926380698682
+
+real	0m0,145s (26,6% of serial)
+user	0m0,562s
+sys	    0m0,000s
+
+
+1 main and 3 threads gives output :
+
+Thread 1 calculating integral from 125000001 to 250000000
+Thread 3 calculating integral from 375000001 to 500000000
+Thread 2 calculating integral from 250000001 to 375000000
+Sum from thread 1 = 0.874676
+sum from main = 0.979915
+Sum from thread 3 = 0.567588
+Sum from thread 2 = 0.719414

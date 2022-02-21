@@ -3,7 +3,6 @@
 #include <math.h>
 #include <string.h>
 #include <sys/time.h>
-#include <pthread.h>
 
 static double get_wall_seconds() {
   struct timeval tv;
@@ -14,38 +13,9 @@ static double get_wall_seconds() {
 
 double **A,**B,**C;
 int n;
-int per_thread;
-
-void* fill_matrix(void *arg){
-  int index = *(int*)arg;
-  int start = per_thread*index;
-  int stop = per_thread*(index+1);
-  int i,j;
-  for (i = start; i<stop;i++){
-    for(j = 0; j<n; j++){
-      A[i][j] = rand() % 5 + 1;
-      B[i][j] = rand() % 5 + 1;
-      C[i][j] = 0.0;
-    }
-  }
-  return NULL;
-}
-
-void* calc_matrix_mult(void *arg){
-  int index = *(int*)arg;
-  int start = per_thread*index;
-  int stop = per_thread*(index+1);
-  int i,j,k;
-  for(i=start; i<stop; i++)
-    for (j=0; j<n; j++)
-      for (k=0; k<n; k++)
-	C[i][j] += A[i][k] * B[k][j];
-  return NULL;
-}
 
 int main(int argc, char *argv[]) {
   int i, j, k;
-  pthread_t thread[4];
 
   if(argc != 2) {
     printf("Please give one argument: the matrix size n\n");
@@ -53,8 +23,6 @@ int main(int argc, char *argv[]) {
   }
 
   n = atoi(argv[1]);
-  per_thread = n/4;
-  int index[4];
   
   //Allocate and fill matrices
   A = (double **)malloc(n*sizeof(double *));
@@ -66,23 +34,22 @@ int main(int argc, char *argv[]) {
     C[i] = (double *)malloc(n*sizeof(double));
   }
 
-  for (i = 0; i<4; i++){
-    index[i] = i;
-    pthread_create(&thread[i],NULL,fill_matrix,&index[i]);
-  }
-  for (i = 0; i<4; i++){
-    pthread_join(thread[i],NULL);
-  }
+  for (i = 0; i<n; i++)
+    for(j=0;j<n;j++){
+      A[i][j] = rand() % 5 + 1;
+      B[i][j] = rand() % 5 + 1;
+      C[i][j] = 0.0;
+    }
+
   printf("Doing matrix-matrix multiplication...\n");
   double startTime = get_wall_seconds();
 
   // Multiply C=A*B
-  for(i=0; i<4; i++){
-    pthread_create(&thread[i],NULL,calc_matrix_mult,&index[i]);
-  }
-  for(i=0; i<4; i++){
-    pthread_join(thread[i],NULL);
-  }
+  for(i=0; i<n; i++)
+    for (j=0; j<n; j++)
+      for (k=0; k<n; k++)
+	C[i][j] += A[i][k] * B[k][j];
+
   double timeTaken = get_wall_seconds() - startTime;
   printf("Elapsed time: %f wall seconds\n", timeTaken);
 

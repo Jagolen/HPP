@@ -1,0 +1,8 @@
+Regular code:
+Time: 2.256530  NUM_THREADS: 5
+
+Optimized code:
+Time: 0.386531  NUM_THREADS: 5
+
+Space complexity : 2n
+Time complexity : n²
