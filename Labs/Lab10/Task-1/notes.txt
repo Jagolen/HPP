@@ -1,0 +1,15 @@
+Compiling with gcc hello_openmp.c : 
+Only one "Bonjour" is printed.
+
+Compiling with gcc -fopenmp hello_openmp.c : 
+Five "Bonjour"'s are printed since we have five threads defined.
+Changing the number of threads to 7 gives 7 "Bonjour"'s etc.
+Removing the num_threads() clause makes it default to 4 threads.
+Echoing the OMP_NUM_THREADS gives no output.
+Changing the default number of threads to 3 by using export
+works well and the program prints 3 "Bonjour"s. We also get
+an output of 3 when we echo OMP_NUM_THREADS. Unset works and
+now we get four prints.
+
+omp_set_num_threads(7) sets the number of threads to 7
+inside the function.
