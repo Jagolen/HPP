@@ -57,7 +57,7 @@ void SumInForce(int i, int j, double EPS, double *restrict sum_x, double *restri
 }
 
 void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y, vec *particles, int N){
-    sleep(0.5);
+    sleep(1);
     head->region_x_min = min_x;
     head->region_y_min = min_y;
     head->region_x_max = max_x;
@@ -66,13 +66,16 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
     head->mass = 0;
     head->center_of_mass = 0;
     int numparticles = 0;
-    double mid_width = (max_x-min_x)/2, mid_height = (max_y-min_y)/2;
+    double width = max_x-min_x, height = max_y-min_y;
     vec *particle;
     printf("min x %lf\t",min_x);
     printf("max x%lf\n",max_x);
     printf("min y %lf\t",min_y);
     printf("max y %lf\n",max_y);
     for(int i = 0; i<N; i++){
+
+        printf("%lf\t",particles[i].pos_x);
+
         if(particles[i].pos_x > min_x && particles[i].pos_x < max_x && particles[i].pos_y > min_y && particles[i].pos_y<max_y){
             numparticles ++;
             vec *particle = &particles[i];
@@ -90,14 +93,14 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
         head->branch_3 = &sub_node[2];
         head->branch_4 = &sub_node[3];
         printf("More than one\n");
-        printf("BRANCH 1: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x,min_y+mid_height,max_x-mid_width,max_y);
-        create_tree(&(head->branch_1),min_x,min_y+mid_height,max_x-mid_width,max_y,particles,N);
-        printf("BRANCH 2: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x+mid_width,min_y+mid_height,max_x,max_y);
-        create_tree(&(head->branch_2),min_x+mid_width,min_y+mid_height,max_x,max_y,particles,N);
-        printf("BRANCH 3: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x,min_y,max_x-mid_width,max_y-mid_height);
-        create_tree(&(head->branch_3),min_x,min_y,max_x-mid_width,max_y-mid_height,particles,N);
-        printf("BRANCH 4: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x+mid_width,min_y,max_x,max_y-mid_height);
-        create_tree(&(head->branch_4),min_x+mid_width,min_y,max_x,max_y-mid_height,particles,N);
+        printf("BRANCH 1: Creating tree in region xmin = %lf xmax = %lf ymin = %lf ymax %lf\n",min_x,(max_x-min_x)/2.0,min_y,(max_y-min_y)/2.0);
+        create_tree(&(head->branch_1),min_x,min_y,(max_x-min_x)/2.0,(max_y-min_y)/2.0,particles,N);
+        printf("BRANCH 2: Creating tree in region xmin = %lf xmax = %lf ymin = %lf ymax %lf\n",(max_x-min_x/2.0),max_x,min_y,(max_y-min_y)/2.0);
+        create_tree(&(head->branch_2),(max_x-min_x)/2.0,min_y,max_x,(max_y-min_y)/2.0,particles,N);
+        printf("BRANCH 3: Creating tree in region xmin = %lf xmax = %lf ymin = %lf ymax %lf\n",min_x,(max_x-min_x)/2.0,(max_y-min_y)/2.0,max_y);
+        create_tree(&(head->branch_3),min_x,(max_y-min_y)/2.0,(max_x-min_x)/2.0,max_y,particles,N);
+        printf("BRANCH 4: Creating tree in region xmin = %lf xmax = %lf ymin = %lf ymax %lf\n",(max_x-min_x/2.0),max_x,(max_y-min_y)/2.0,max_y);
+        create_tree(&(head->branch_4),(max_x-min_x)/2.0,(max_y-min_y)/2.0,max_x,max_y,particles,N);
     }
     else{
         printf("End of branch\n");

@@ -23,21 +23,14 @@ typedef struct galsim{
     double v_x, v_y;	
     double v_x_new, v_y_new;	
     double mass;	
-    double brightness;
+    double brightness;	
 } vec;
 
-typedef struct quadtree{
-    struct quadtree *branch_1, *branch_2, *branch_3, *branch_4;
-    double mass, center_of_mass;
-    double region_x_min, region_x_max, region_y_min, region_y_max;
-    struct vec *particle;
-    unsigned int relevant;
-} qt;
 
 vec *p;
 
 // The function for the summation in the formula for the force
-void SumInForce(int i, int j, double EPS, double *restrict sum_x, double *restrict sum_y, vec *p){
+static inline void SumInForce(int i, int j, double EPS, double *restrict sum_x, double *restrict sum_y, vec *p){
     double r_x, r_y, r_vec, r_ij, num, temp1, temp2, temp3, temp4;
     r_x = p[i].pos_x - p[j].pos_x;
     r_y = p[i].pos_y - p[j].pos_y;
@@ -54,59 +47,6 @@ void SumInForce(int i, int j, double EPS, double *restrict sum_x, double *restri
     temp4   = temp1 * p[j].mass;
     *sum_x += temp4 * r_x;
     *sum_y += temp4 * r_y;
-}
-
-void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y, vec *particles, int N){
-    sleep(0.5);
-    head->region_x_min = min_x;
-    head->region_y_min = min_y;
-    head->region_x_max = max_x;
-    head->region_y_max = max_y;
-    head->relevant = 0;
-    head->mass = 0;
-    head->center_of_mass = 0;
-    int numparticles = 0;
-    double mid_width = (max_x-min_x)/2, mid_height = (max_y-min_y)/2;
-    vec *particle;
-    printf("min x %lf\t",min_x);
-    printf("max x%lf\n",max_x);
-    printf("min y %lf\t",min_y);
-    printf("max y %lf\n",max_y);
-    for(int i = 0; i<N; i++){
-        if(particles[i].pos_x > min_x && particles[i].pos_x < max_x && particles[i].pos_y > min_y && particles[i].pos_y<max_y){
-            numparticles ++;
-            vec *particle = &particles[i];
-        }
-    }
-    printf("Particles: %d\n",numparticles);
-    if(numparticles < 1){
-        printf("Setting a node to NULL!\n");
-        head = NULL;
-    }
-    else if(numparticles > 1){
-        qt *sub_node = (qt*) malloc(4*sizeof(qt));
-        head->branch_1 = &sub_node[0];
-        head->branch_2 = &sub_node[1];
-        head->branch_3 = &sub_node[2];
-        head->branch_4 = &sub_node[3];
-        printf("More than one\n");
-        printf("BRANCH 1: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x,min_y+mid_height,max_x-mid_width,max_y);
-        create_tree(&(head->branch_1),min_x,min_y+mid_height,max_x-mid_width,max_y,particles,N);
-        printf("BRANCH 2: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x+mid_width,min_y+mid_height,max_x,max_y);
-        create_tree(&(head->branch_2),min_x+mid_width,min_y+mid_height,max_x,max_y,particles,N);
-        printf("BRANCH 3: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x,min_y,max_x-mid_width,max_y-mid_height);
-        create_tree(&(head->branch_3),min_x,min_y,max_x-mid_width,max_y-mid_height,particles,N);
-        printf("BRANCH 4: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x+mid_width,min_y,max_x,max_y-mid_height);
-        create_tree(&(head->branch_4),min_x+mid_width,min_y,max_x,max_y-mid_height,particles,N);
-    }
-    else{
-        printf("End of branch\n");
-        head->branch_1 = NULL;
-        head->branch_2 = NULL;
-        head->branch_3 = NULL;
-        head->branch_4 = NULL;
-        head->particle = particle;
-    }
 }
 
 
@@ -179,11 +119,6 @@ int main(const int argc, char *argv[]){
 
     // Starting the timer
     start_time = get_wall_seconds();
-
-    //Initializing tree
-    qt *head = (qt*) malloc(sizeof(qt));
-    create_tree(&head,0.0,0.0,1.0,1.0,p,N);
-
 
     // Implementing the algorithm
     for(n = 0; n < nsteps; n++){
