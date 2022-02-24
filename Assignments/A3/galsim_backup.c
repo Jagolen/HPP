@@ -15,10 +15,6 @@ static double get_wall_seconds() {
     return seconds;
 }
 
-typedef struct particle{
-    double r_x, r_y, v_x, v_y, mass, bgtness;
-} particle_t;
-
 // The function for the summation in the formula for the force
 static inline void SumInForce(int i, int j, double EPS, double *restrict sum_x, double *restrict sum_y, double *restrict inputs){
     double r_x, r_y, r_vec, r_ij, num, temp1, temp2, temp3, temp4;
@@ -69,8 +65,8 @@ int main(const int argc, char *argv[]){
 
     // Alocatting the memory dynamically
     double *inputs, *outputs;
-    inputs  = (particle_t*)malloc(N*sizeof(particle_t));
-    outputs = (particle_t*)malloc(N*sizeof(particle_t));
+    inputs  = (double*)malloc(6*N*sizeof(double));
+    outputs = (double*)malloc(6*N*sizeof(double));
     
     FILE *file_in, *file_out;
     // Opening the input file

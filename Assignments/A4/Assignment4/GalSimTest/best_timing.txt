@@ -1,0 +1,2 @@
+1.8323
+Intel(R) Core(TM) i5-10210U CPU @ 1.60GHz
