@@ -102,9 +102,7 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
     //printf("Mass = %lf, Center of mass: x = %lf, y = %lf\n",head->mass,head->center_of_mass_x,head->center_of_mass_y);
     //printf("Particles: %d\n",numparticles);
     if(numparticles < 1){
-        qt **set_null = &head;
-        //printf("Setting a node to NULL!\n");
-        set_null = NULL;
+        head = NULL;
     }
     else if(numparticles > 1){
         qt *sub1 = (qt*) malloc(sizeof(qt));
@@ -138,11 +136,17 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
 void delete_tree(qt **head){
     if(*head == NULL) return;
     printf("%lf\n",(*head)->mass);
+    printf("Deleting branch 1\n");
     delete_tree(&((*head)->branch_1));
+    printf("Deleting branch 2\n");
     delete_tree(&((*head)->branch_2));
+    printf("Deleting branch 3");
     delete_tree(&((*head)->branch_3));
+    printf("Deleting branch 4");
     delete_tree(&((*head)->branch_4));
+    printf("Now freeing *head");
     free(*head);
+    printf("Setting head to NULL");
     *head=NULL;
 }
 
@@ -161,7 +165,7 @@ int main(const int argc, char *argv[]){
     const int nsteps      =  atoi(argv[3]);
     const double delta_t  =  atof(argv[4]);
     const int graphics    =  atoi(argv[5]);
-    const int theta       =  0.7;
+    const int theta       =  0.1;
     
     // Graphics settings
     const float circleRadius = 0.003, circleColor = 0;
@@ -178,6 +182,8 @@ int main(const int argc, char *argv[]){
     // Alocatting the memory dynamically
 
     p = (vec*) malloc(N*sizeof(vec));
+
+    qt *list = NULL;
     
     FILE *file_in, *file_out;
     // Opening the input file
@@ -260,10 +266,12 @@ int main(const int argc, char *argv[]){
             if (graphics == 1)
                 DrawCircle((float)(p[k].pos_x), (float)(p[k].pos_y), 1, 1, circleRadius, circleColor);
         }
-        printf("Innan DELETE_TREE (Step %d)\n",n);
-        delete_tree(&head);
-        //free(head);
-        printf("EFTER DELETE_TREE)\n");
+        //printf("Innan DELETE_TREE (Step %d)\n",n);
+        qt **set_null = &head;
+        delete_tree(&list);
+        *set_null = NULL;
+        free(head);
+        //printf("EFTER DELETE_TREE)\n");
 
         // Refreshing and sleeping
         if (graphics == 1){
