@@ -28,19 +28,19 @@ typedef struct galsim{
 
 typedef struct quadtree{
     struct quadtree *branch_1, *branch_2, *branch_3, *branch_4;
-    double mass, center_of_mass;
+    double mass, center_of_mass_x, center_of_mass_y;
     double region_x_min, region_x_max, region_y_min, region_y_max;
-    struct vec *particle;
-    unsigned int relevant;
+    double theta_check;
+    vec *particle;
 } qt;
 
 vec *p;
 
 // The function for the summation in the formula for the force
-void SumInForce(int i, int j, double EPS, double *restrict sum_x, double *restrict sum_y, vec *p){
+void SumInForce(int i, int j, double EPS, double *restrict sum_x, double *restrict sum_y, qt *p){
     double r_x, r_y, r_vec, r_ij, num, temp1, temp2, temp3, temp4;
-    r_x = p[i].pos_x - p[j].pos_x;
-    r_y = p[i].pos_y - p[j].pos_y;
+    r_x = p[i].center_of_mass_x - p[j].center_of_mass_x;
+    r_y = p[i].center_of_mass_y - p[j].center_of_mass_y;
 
     // The distance between the particle
     r_vec = (r_x * r_x) + (r_y * r_y);
@@ -57,30 +57,39 @@ void SumInForce(int i, int j, double EPS, double *restrict sum_x, double *restri
 }
 
 void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y, vec *particles, int N){
-    sleep(1);
+    sleep(0.5);
     head->region_x_min = min_x;
     head->region_y_min = min_y;
     head->region_x_max = max_x;
     head->region_y_max = max_y;
-    head->relevant = 0;
+    head->theta_check = 0;
     head->mass = 0;
-    head->center_of_mass = 0;
+    head->center_of_mass_x = 0;
+    head->center_of_mass_y = 0;
     int numparticles = 0;
-    double width = max_x-min_x, height = max_y-min_y;
+    double mid_width = (max_x-min_x)/2, mid_height = (max_y-min_y)/2;
     vec *particle;
     printf("min x %lf\t",min_x);
     printf("max x%lf\n",max_x);
     printf("min y %lf\t",min_y);
     printf("max y %lf\n",max_y);
     for(int i = 0; i<N; i++){
-
-        printf("%lf\t",particles[i].pos_x);
-
         if(particles[i].pos_x > min_x && particles[i].pos_x < max_x && particles[i].pos_y > min_y && particles[i].pos_y<max_y){
+            head->mass += particles[i].mass;
+            head->center_of_mass_x += particles[i].pos_x*particles[i].mass;
+            head->center_of_mass_y += particles[i].pos_y*particles[i].mass;
             numparticles ++;
-            vec *particle = &particles[i];
+            particle = &particles[i];
+            
         }
     }
+    if(numparticles !=0){
+        head->center_of_mass_x /= head->mass;
+        head->center_of_mass_y /= head->mass;
+    }
+    double dist = sqrt((head->center_of_mass_x-mid_width)*(head->center_of_mass_x-mid_width)+(head->center_of_mass_y-mid_height)*(head->center_of_mass_y-mid_height));
+    head->theta_check = (mid_width*2)/dist;
+    printf("Mass = %lf, Center of mass: x = %lf, y = %lf\n",head->mass,head->center_of_mass_x,head->center_of_mass_y);
     printf("Particles: %d\n",numparticles);
     if(numparticles < 1){
         printf("Setting a node to NULL!\n");
@@ -93,14 +102,14 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
         head->branch_3 = &sub_node[2];
         head->branch_4 = &sub_node[3];
         printf("More than one\n");
-        printf("BRANCH 1: Creating tree in region xmin = %lf xmax = %lf ymin = %lf ymax %lf\n",min_x,(max_x-min_x)/2.0,min_y,(max_y-min_y)/2.0);
-        create_tree(&(head->branch_1),min_x,min_y,(max_x-min_x)/2.0,(max_y-min_y)/2.0,particles,N);
-        printf("BRANCH 2: Creating tree in region xmin = %lf xmax = %lf ymin = %lf ymax %lf\n",(max_x-min_x/2.0),max_x,min_y,(max_y-min_y)/2.0);
-        create_tree(&(head->branch_2),(max_x-min_x)/2.0,min_y,max_x,(max_y-min_y)/2.0,particles,N);
-        printf("BRANCH 3: Creating tree in region xmin = %lf xmax = %lf ymin = %lf ymax %lf\n",min_x,(max_x-min_x)/2.0,(max_y-min_y)/2.0,max_y);
-        create_tree(&(head->branch_3),min_x,(max_y-min_y)/2.0,(max_x-min_x)/2.0,max_y,particles,N);
-        printf("BRANCH 4: Creating tree in region xmin = %lf xmax = %lf ymin = %lf ymax %lf\n",(max_x-min_x/2.0),max_x,(max_y-min_y)/2.0,max_y);
-        create_tree(&(head->branch_4),(max_x-min_x)/2.0,(max_y-min_y)/2.0,max_x,max_y,particles,N);
+        printf("BRANCH 1: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x,min_y+mid_height,max_x-mid_width,max_y);
+        create_tree(head->branch_1,min_x,min_y+mid_height,max_x-mid_width,max_y,particles,N);
+        printf("BRANCH 2: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x+mid_width,min_y+mid_height,max_x,max_y);
+        create_tree(head->branch_2,min_x+mid_width,min_y+mid_height,max_x,max_y,particles,N);
+        printf("BRANCH 3: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x,min_y,max_x-mid_width,max_y-mid_height);
+        create_tree(head->branch_3,min_x,min_y,max_x-mid_width,max_y-mid_height,particles,N);
+        printf("BRANCH 4: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x+mid_width,min_y,max_x,max_y-mid_height);
+        create_tree(head->branch_4,min_x+mid_width,min_y,max_x,max_y-mid_height,particles,N);
     }
     else{
         printf("End of branch\n");
@@ -128,6 +137,7 @@ int main(const int argc, char *argv[]){
     const int nsteps      =  atoi(argv[3]);
     const double delta_t  =  atof(argv[4]);
     const int graphics    =  atoi(argv[5]);
+    const int theta       =  0.7;
     
     // Graphics settings
     const float circleRadius = 0.003, circleColor = 0;
@@ -185,7 +195,7 @@ int main(const int argc, char *argv[]){
 
     //Initializing tree
     qt *head = (qt*) malloc(sizeof(qt));
-    create_tree(&head,0.0,0.0,1.0,1.0,p,N);
+    create_tree(head,0.0,0.0,1.0,1.0,p,N);
 
 
     // Implementing the algorithm
@@ -197,10 +207,10 @@ int main(const int argc, char *argv[]){
 
             // Summing as long as i is not equal j
             for(j = 0; j < i; j++){
-                SumInForce(i, j, EPS, &sum_x, &sum_y, p);
+                SumInForce(i, j, EPS, &sum_x, &sum_y, head);
             }
             for(j = i+1; j < N; j++){
-                SumInForce(i, j, EPS, &sum_x, &sum_y, p);
+                SumInForce(i, j, EPS, &sum_x, &sum_y, head);
             } 
             // Calculating the forces of particle i
             F_x = -G * p[i].mass * sum_x;
