@@ -42,11 +42,17 @@ void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *hea
     }
 
     double r_x, r_y, r_vec, r_ij, num, temp1, temp2, temp3, temp4;
+    //printf("CENTER OF MASS X = %lf, Y = %lf\n",head->center_of_mass_x,head->center_of_mass_y);
+    //printf("pos_x = %lf, pos_y = %lf\n",p[i].pos_x,p[i].pos_y);
     r_x = head->center_of_mass_x-p[i].pos_x;
     r_y = head->center_of_mass_y-p[i].pos_y;
+    //printf("r_x = %lf, r_y = %lf",r_x,r_y);
     r_vec = (r_x * r_x) + (r_y * r_y);
+    //printf("R_VEC = %lf\n",r_vec);
     r_ij = sqrt(r_vec);
     double theta_compare = (head->region_x_max-head->region_x_min)/r_ij;
+    printf("R_ij = %lf\n",r_ij);
+    printf("Theta = %lf, Theta_Compare = %lf\n",theta,theta_compare);
 
     if (theta_compare>theta){
     SumInForce(i,EPS,sum_x,sum_y,p,head->branch_1,theta);
@@ -59,6 +65,7 @@ void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *hea
 
     // The summation
     temp2   =  r_ij + EPS;
+    printf("Temp 2 = %lf\n",temp2);
     temp3   = temp2 *temp2;
     num     = temp2 * temp3;
     temp1   = 1.0/num;
@@ -83,28 +90,36 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
     //printf("max x%lf\n",max_x);
     //printf("min y %lf\t",min_y);
     //printf("max y %lf\n",max_y);
+    double sum_x = 0;
+    double sum_y = 0;
     for(int i = 0; i<N; i++){
         if(particles[i].pos_x > min_x && particles[i].pos_x < max_x && particles[i].pos_y > min_y && particles[i].pos_y<max_y){
             head->mass += particles[i].mass;
-            head->center_of_mass_x += particles[i].pos_x*particles[i].mass;
-            head->center_of_mass_y += particles[i].pos_y*particles[i].mass;
+            sum_x+= (particles[i].pos_x*particles[i].mass);
+            sum_y+= (particles[i].pos_y*particles[i].mass);
+
             numparticles ++;
             //particle = &particles[i];
-            
+                
+        //head->center_of_mass_x /= head->mass;
+        //head->center_of_mass_y /= head->mass;
         }
     }
-    if(numparticles !=0){
-        head->center_of_mass_x /= head->mass;
-        head->center_of_mass_y /= head->mass;
-    }
+    head->center_of_mass_x = sum_x/head->mass;
+    head->center_of_mass_y = sum_y/head->mass;
+
     //double dist = sqrt((head->center_of_mass_x-mid_width)*(head->center_of_mass_x-mid_width)+(head->center_of_mass_y-mid_height)*(head->center_of_mass_y-mid_height));
     //head->theta_check = (mid_width*2)/dist;
-    //printf("Mass = %lf, Center of mass: x = %lf, y = %lf\n",head->mass,head->center_of_mass_x,head->center_of_mass_y);
+    printf("Mass = %lf, Center of mass: x = %lf, y = %lf\n",head->mass,head->center_of_mass_x,head->center_of_mass_y);
     //printf("Particles: %d\n",numparticles);
-    if(numparticles < 1){
-        head = NULL;
-    }
-    else if(numparticles > 1){
+/*     if(numparticles < 1){
+        //head = NULL;
+        head->branch_1 = NULL;
+        head->branch_2 = NULL;
+        head->branch_3 = NULL;
+        head->branch_4 = NULL;
+    } */
+    if(numparticles > 1){
         qt *sub1 = (qt*) malloc(sizeof(qt));
         qt *sub2 = (qt*) malloc(sizeof(qt));
         qt *sub3 = (qt*) malloc(sizeof(qt));
@@ -135,18 +150,18 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
 
 void delete_tree(qt **head){
     if(*head == NULL) return;
-    printf("%lf\n",(*head)->mass);
-    printf("Deleting branch 1\n");
+    //printf("%lf\n",(*head)->mass);
+    //printf("Deleting branch 1\n");
     delete_tree(&((*head)->branch_1));
-    printf("Deleting branch 2\n");
+    //printf("Deleting branch 2\n");
     delete_tree(&((*head)->branch_2));
-    printf("Deleting branch 3");
+    //printf("Deleting branch 3");
     delete_tree(&((*head)->branch_3));
-    printf("Deleting branch 4");
+    //printf("Deleting branch 4");
     delete_tree(&((*head)->branch_4));
-    printf("Now freeing *head");
+    //printf("Now freeing *head");
     free(*head);
-    printf("Setting head to NULL");
+    //printf("Setting head to NULL");
     *head=NULL;
 }
 
@@ -165,7 +180,7 @@ int main(const int argc, char *argv[]){
     const int nsteps      =  atoi(argv[3]);
     const double delta_t  =  atof(argv[4]);
     const int graphics    =  atoi(argv[5]);
-    const int theta       =  0.1;
+    double theta       =  0;
     
     // Graphics settings
     const float circleRadius = 0.003, circleColor = 0;
@@ -231,8 +246,10 @@ int main(const int argc, char *argv[]){
             // Summing as long as i is not equal j
             SumInForce(i, EPS, &sum_x, &sum_y, p, head,theta);
             // Calculating the forces of particle i
+            //printf("sum_x = %lf, sum_y = %lf\n");
             F_x = -G * p[i].mass * sum_x;
             F_y = -G * p[i].mass * sum_y;
+            //printf("Force x = %lf, x = %lf\n",F_x,F_y);
 
             // The acceleration of particle i
             temp10 = 1.0/p[i].mass;
@@ -268,7 +285,7 @@ int main(const int argc, char *argv[]){
         }
         //printf("Innan DELETE_TREE (Step %d)\n",n);
         qt **set_null = &head;
-        delete_tree(&list);
+        delete_tree(set_null);
         *set_null = NULL;
         free(head);
         //printf("EFTER DELETE_TREE)\n");
