@@ -175,7 +175,7 @@ void delete_tree(qt **head){
 int main(const int argc, char *argv[]){
 
     // Checking if the input arguments to the program are corret
-    if (argc != 6) {
+    if (argc != 7) {
         printf("Give 5 input arguments: int N, filename.gal , int nsteps, double delta_t, graphics (0 or 1) .\n");
         exit(1);
     }
@@ -186,8 +186,9 @@ int main(const int argc, char *argv[]){
     const int N           =  atoi(argv[1]);
     const int nsteps      =  atoi(argv[3]);
     const double delta_t  =  atof(argv[4]);
-    const int graphics    =  atoi(argv[5]);
-    double theta       =  0.2;
+    const double theta    =  atof(argv[5]);
+    const int graphics    =  atoi(argv[6]);
+    
     
     // Graphics settings
     const float circleRadius = 0.003, circleColor = 0;
@@ -222,7 +223,7 @@ int main(const int argc, char *argv[]){
         fread(&p[i].mass,      sizeof(double), 1, file_in);
         fread(&p[i].v_x,       sizeof(double), 1, file_in);
         fread(&p[i].v_y,       sizeof(double), 1, file_in);
-        fread(&p[i].brightness,    sizeof(double), 1, file_in);
+        fread(&p[i].brightness,sizeof(double), 1, file_in);
     } 
 
     // Closing the input file
