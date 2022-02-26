@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <omp.h>
 
-const long int NA = 700000000;
-const long int NB = 100000000;
+const long int NA = 400000000;
+const long int NB = 400000000;
 
 long int thread_func_A() {
   long int i;
@@ -25,7 +25,7 @@ int main() {
 
   long int result_A;
   long int result_B;
-
+double time = omp_get_wtime();
 #pragma omp parallel num_threads(2)
   {
     int id = omp_get_thread_num();
@@ -34,13 +34,14 @@ int main() {
     else
       result_B = thread_func_B();
   }
-
+time = omp_get_wtime()-time;
   printf("This is the main() function after the parallel block.\n");
 
   printf("result_A : %ld\n", result_A);
   printf("result_B : %ld\n", result_B);
   long int totalSum = result_A + result_B;
   printf("totalSum : %ld\n", totalSum);
+  printf("Wall time = %lf\n",time);
 
   return 0;
 }

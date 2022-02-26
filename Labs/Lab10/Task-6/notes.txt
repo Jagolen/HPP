@@ -1,0 +1,11 @@
+For primes under 300000
+Wall times
+1 thread : 5.347300s
+2 threads : 2.715695s
+3 threads : 2.727074s (one of the threads only finds 1 prime)
+4 threads : 1.385811s (25,9% of 1 thread)
+5 threads : 1.399173s
+6 threads : 1.399173s
+10 threads : 1.408294s
+100 threads : 1.416998s
+1000 threads : 1.410843s

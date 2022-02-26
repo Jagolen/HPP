@@ -1,0 +1,11 @@
+NA = 700000000, NB = 100000000
+Wall time : 0.380611s
+
+NA = 800000000, NB = 0
+Wall time : 0.434992s
+
+NA = 400000000, NB = 400000000
+Wall time : 0.232232s
+
+I see the cpu usage is 200% but when one thread finishes, it goes
+down to 100%

@@ -6,10 +6,15 @@ typedef struct DataForThread {
   double B;
   int x;
   int y;
+  double result;
 } DataForThread_t;
 
 void thread_func(DataForThread_t* p) {
   printf("This is inside thread_func()!\n");
+  printf("A = %lf, B = %lf, x = %d, y =%d\n",p->A,p->B,p->x,p->y);
+  printf("Calculating A*x+b*y...\n");
+  p->result = p->A*p->x+p->B*p->y;
+  printf("Done! Result is %lf\n",p->result);
 }
 
 int main(int argc, char** argv) {
@@ -35,6 +40,6 @@ int main(int argc, char** argv) {
     /* Call thread_func and give it a pointer to arr[id] as input. */
     thread_func(&arr[id]);
   }
-
+  printf("Result from arr[0] = %lf, Result from arr[1] = %lf\n",arr[0].result,arr[1].result);
   return 0;
 }
