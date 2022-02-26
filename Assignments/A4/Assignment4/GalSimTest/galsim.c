@@ -30,22 +30,23 @@ typedef struct quadtree{
     struct quadtree *branch_1, *branch_2, *branch_3, *branch_4;
     double mass, center_of_mass_x, center_of_mass_y;
     double region_x_min, region_x_max, region_y_min, region_y_max;
-    //vec *particle;
+    unsigned int empty;
 } qt;
 
 vec *p;
 
 // The function for the summation in the formula for the force
 void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *head,double theta){
-    if(head == NULL || head->mass == 0){
+    if(head == NULL || head->empty == 1){
         return;
     }
 
     double r_x, r_y, r_vec, r_ij, num, temp1, temp2, temp3, temp4;
-    //printf("CENTER OF MASS X = %lf, Y = %lf\n",head->center_of_mass_x,head->center_of_mass_y);
-    //printf("pos_x = %lf, pos_y = %lf\n",p[i].pos_x,p[i].pos_y);
-    r_x = head->center_of_mass_x-p[i].pos_x;
-    r_y = head->center_of_mass_y-p[i].pos_y;
+    printf("EMPTY? %d\n",head->empty);
+    printf("CENTER OF MASS X = %lf, Y = %lf\n",head->center_of_mass_x,head->center_of_mass_y);
+    printf("pos_x = %lf, pos_y = %lf\n",p[i].pos_x,p[i].pos_y);
+    r_x = p[i].pos_x-head->center_of_mass_x;
+    r_y = p[i].pos_y-head->center_of_mass_y;
     //printf("r_x = %lf, r_y = %lf",r_x,r_y);
     r_vec = (r_x * r_x) + (r_y * r_y);
     //printf("R_VEC = %lf\n",r_vec);
@@ -54,7 +55,7 @@ void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *hea
     printf("R_ij = %lf\n",r_ij);
     printf("Theta = %lf, Theta_Compare = %lf\n",theta,theta_compare);
 
-    if (theta_compare>theta){
+    if (theta_compare>theta && (head->branch_1 != NULL || head ->branch_2 != NULL || head->branch_3 != NULL || head->branch_4 != NULL)){
     SumInForce(i,EPS,sum_x,sum_y,p,head->branch_1,theta);
     SumInForce(i,EPS,sum_x,sum_y,p,head->branch_2,theta);
     SumInForce(i,EPS,sum_x,sum_y,p,head->branch_3,theta);
@@ -83,6 +84,8 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
     head->mass = 0;
     head->center_of_mass_x = 0;
     head->center_of_mass_y = 0;
+    head->empty = 0;
+
     int numparticles = 0;
     double mid_width = (max_x-min_x)/2, mid_height = (max_y-min_y)/2;
     //vec *particle;
@@ -144,6 +147,10 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
         head->branch_2 = NULL;
         head->branch_3 = NULL;
         head->branch_4 = NULL;
+        if (numparticles < 1) {
+            head->empty = 1;
+            printf("NODE EMPTY\n");
+        }
         //head->particle = particle;
     }
 }
