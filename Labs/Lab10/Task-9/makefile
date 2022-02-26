@@ -1,7 +1,7 @@
 CC = gcc
 LD = gcc
-CFLAGS = -O3 -Wall -Werror
-LDFLAGS = 
+CFLAGS = -O3 -fopenmp -Wall -Werror
+LDFLAGS = -fopenmp
 RM = /bin/rm -f
 OBJS = main.o sort_funcs.o
 EXECUTABLE = sort_test

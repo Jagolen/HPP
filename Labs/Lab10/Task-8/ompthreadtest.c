@@ -7,6 +7,7 @@ int N = 100000;
 void the_thread_func() {
 
   for(int i = 1; i <= N; ++i) {
+    #pragma omp critical
     sum += 1;
   }
 

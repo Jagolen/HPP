@@ -1,0 +1,15 @@
+If omp_set_nested(0) #pragma is ignored inside another pragma,
+i.e. we can only run functions on one thread inside the first
+omp block. Setting omp_set_nested(1) we get 2 threads
+which then creates 2 threads each, leading to 4 threads in the
+inner loop, as expected.
+
+main file Wall seconds
+Sorting 1000000 numbers
+
+1 thread : 1.046s
+2 threads : 0.056s
+3 threads : 0.557s
+4 threads : 0.311s
+5 threads : 0.314s
+6 threads : 0.316s

@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <omp.h>
 #include "sort_funcs.h"
+#include <stdio.h>
 
 void bubble_sort(intType* list, int N) {
   int i, j;
@@ -14,11 +16,12 @@ void bubble_sort(intType* list, int N) {
     }
 }
 
-void merge_sort(intType* list_to_sort, int N) {
+void merge_sort(intType* list_to_sort, int N, int nthreads) {
   if(N == 1) {
     // Only one element, no sorting needed. Just return directly in this case.
     return;
   }
+  //printf("NThreads is %d\n",nthreads);
   int n1 = N / 2;
   int n2 = N - n1;
   // Allocate new lists
@@ -30,8 +33,21 @@ void merge_sort(intType* list_to_sort, int N) {
   for(i = 0; i < n2; i++)
     list2[i] = list_to_sort[n1+i];
   // Sort list1 and list2
-  merge_sort(list1, n1);
-  merge_sort(list2, n2);
+  
+  if(nthreads <= 1){
+    //printf("Only one thread\n");
+    merge_sort(list1, n1,nthreads/2);
+    merge_sort(list2, n2,nthreads/2);
+  }
+  else{
+    #pragma omp parallel num_threads(2)
+    {
+      //printf("Creating two threads!\n");
+      if(omp_get_thread_num()==0) merge_sort(list1, n1,nthreads/2);
+      else merge_sort(list2, n2,nthreads/2);
+    }
+  }
+
   // Merge!
   int i1 = 0;
   int i2 = 0;
