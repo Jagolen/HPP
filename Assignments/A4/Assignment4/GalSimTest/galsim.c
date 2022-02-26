@@ -37,42 +37,33 @@ vec *p;
 
 // The function for the summation in the formula for the force
 void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *head,double theta){
-    if(head == NULL || head->empty == 1){
+    if(head->empty == 1){
         return;
     }
 
-    double r_x, r_y, r_vec, r_ij, num, temp1, temp2, temp3, temp4;
-    //printf("EMPTY? %d\n",head->empty);
-    //printf("CENTER OF MASS X = %lf, Y = %lf\n",head->center_of_mass_x,head->center_of_mass_y);
-    //printf("pos_x = %lf, pos_y = %lf\n",p[i].pos_x,p[i].pos_y);
+    double r_x, r_y, r_vec, r_ij, num, num_div, r_eps, sum;
     r_x = p[i].pos_x-head->center_of_mass_x;
     r_y = p[i].pos_y-head->center_of_mass_y;
-    //printf("r_x = %lf, r_y = %lf",r_x,r_y);
     r_vec = (r_x * r_x) + (r_y * r_y);
-    //printf("R_VEC = %lf\n",r_vec);
     r_ij = sqrt(r_vec);
     double theta_compare = (head->region_x_max-head->region_x_min)/r_ij;
-    //printf("R_ij = %lf\n",r_ij);
-    //printf("Theta = %lf, Theta_Compare = %lf\n",theta,theta_compare);
 
     if (theta_compare>theta && (head->branch_1 != NULL || head ->branch_2 != NULL || head->branch_3 != NULL || head->branch_4 != NULL)){
-    SumInForce(i,EPS,sum_x,sum_y,p,head->branch_1,theta);
-    SumInForce(i,EPS,sum_x,sum_y,p,head->branch_2,theta);
-    SumInForce(i,EPS,sum_x,sum_y,p,head->branch_3,theta);
-    SumInForce(i,EPS,sum_x,sum_y,p,head->branch_4,theta);
+        SumInForce(i,EPS,sum_x,sum_y,p,head->branch_1,theta);
+        SumInForce(i,EPS,sum_x,sum_y,p,head->branch_2,theta);
+        SumInForce(i,EPS,sum_x,sum_y,p,head->branch_3,theta);
+        SumInForce(i,EPS,sum_x,sum_y,p,head->branch_4,theta);
     }
     else{
     
 
     // The summation
-    temp2   =  r_ij + EPS;
-    //printf("Temp 2 = %lf\n",temp2);
-    temp3   = temp2 *temp2;
-    num     = temp2 * temp3;
-    temp1   = 1.0/num;
-    temp4   = temp1 * head->mass;
-    *sum_x += temp4 * r_x;
-    *sum_y += temp4 * r_y;
+    r_eps   =  r_ij + EPS;
+    num     = r_eps * r_eps * r_eps;
+    num_div   = 1.0/num;
+    sum   = num_div * head->mass;
+    *sum_x += sum * r_x;
+    *sum_y += sum * r_y;
     }
 }
 
@@ -88,40 +79,19 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
 
     int numparticles = 0;
     double mid_width = (max_x-min_x)/2, mid_height = (max_y-min_y)/2;
-    //vec *particle;
-    //printf("min x %lf\t",min_x);
-    //printf("max x%lf\n",max_x);
-    //printf("min y %lf\t",min_y);
-    //printf("max y %lf\n",max_y);
     double sum_x = 0;
     double sum_y = 0;
-    for(int i = 0; i<N; i++){
+    for(unsigned int i = 0; i<N; i++){
         if(particles[i].pos_x > min_x && particles[i].pos_x < max_x && particles[i].pos_y > min_y && particles[i].pos_y<max_y){
             head->mass += particles[i].mass;
             sum_x+= (particles[i].pos_x*particles[i].mass);
             sum_y+= (particles[i].pos_y*particles[i].mass);
-
             numparticles ++;
-            //particle = &particles[i];
-                
-        //head->center_of_mass_x /= head->mass;
-        //head->center_of_mass_y /= head->mass;
         }
     }
     head->center_of_mass_x = sum_x/head->mass;
     head->center_of_mass_y = sum_y/head->mass;
 
-    //double dist = sqrt((head->center_of_mass_x-mid_width)*(head->center_of_mass_x-mid_width)+(head->center_of_mass_y-mid_height)*(head->center_of_mass_y-mid_height));
-    //head->theta_check = (mid_width*2)/dist;
-    //printf("Mass = %lf, Center of mass: x = %lf, y = %lf\n",head->mass,head->center_of_mass_x,head->center_of_mass_y);
-    //printf("Particles: %d\n",numparticles);
-/*     if(numparticles < 1){
-        //head = NULL;
-        head->branch_1 = NULL;
-        head->branch_2 = NULL;
-        head->branch_3 = NULL;
-        head->branch_4 = NULL;
-    } */
     if(numparticles > 1){
         qt *sub1 = (qt*) malloc(sizeof(qt));
         qt *sub2 = (qt*) malloc(sizeof(qt));
@@ -131,44 +101,29 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
         head->branch_2 = sub2;
         head->branch_3 = sub3;
         head->branch_4 = sub4;
-        //printf("More than one\n");
-        //printf("BRANCH 1: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x,min_y+mid_height,max_x-mid_width,max_y);
-        create_tree(head->branch_1,min_x,min_y+mid_height,max_x-mid_width,max_y,particles,N);
-        //printf("BRANCH 2: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x+mid_width,min_y+mid_height,max_x,max_y);
-        create_tree(head->branch_2,min_x+mid_width,min_y+mid_height,max_x,max_y,particles,N);
-        //printf("BRANCH 3: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x,min_y,max_x-mid_width,max_y-mid_height);
-        create_tree(head->branch_3,min_x,min_y,max_x-mid_width,max_y-mid_height,particles,N);
-        //printf("BRANCH 4: Creating tree in region xmin = %lf ymin = %lf xmax = %lf ymax %lf\n",min_x+mid_width,min_y,max_x,max_y-mid_height);
-        create_tree(head->branch_4,min_x+mid_width,min_y,max_x,max_y-mid_height,particles,N);
+        create_tree(head->branch_1, min_x,           min_y+mid_height, max_x-mid_width, max_y,            particles, N);
+        create_tree(head->branch_2, min_x+mid_width, min_y+mid_height, max_x,           max_y,            particles, N);
+        create_tree(head->branch_3, min_x,           min_y,            max_x-mid_width, max_y-mid_height, particles, N);
+        create_tree(head->branch_4, min_x+mid_width, min_y,            max_x,           max_y-mid_height, particles, N);
     }
     else{
-        //printf("End of branch\n");
         head->branch_1 = NULL;
         head->branch_2 = NULL;
         head->branch_3 = NULL;
         head->branch_4 = NULL;
         if (numparticles < 1) {
             head->empty = 1;
-            //printf("NODE EMPTY\n");
         }
-        //head->particle = particle;
     }
 }
 
 void delete_tree(qt **head){
     if(*head == NULL) return;
-    //printf("%lf\n",(*head)->mass);
-    //printf("Deleting branch 1\n");
     delete_tree(&((*head)->branch_1));
-    //printf("Deleting branch 2\n");
     delete_tree(&((*head)->branch_2));
-    //printf("Deleting branch 3");
     delete_tree(&((*head)->branch_3));
-    //printf("Deleting branch 4");
     delete_tree(&((*head)->branch_4));
-    //printf("Now freeing *head");
     free(*head);
-    //printf("Setting head to NULL");
     *head=NULL;
 }
 
@@ -205,8 +160,6 @@ int main(const int argc, char *argv[]){
     // Alocatting the memory dynamically
 
     p = (vec*) malloc(N*sizeof(vec));
-
-    qt *list = NULL;
     
     FILE *file_in, *file_out;
     // Opening the input file
@@ -232,18 +185,16 @@ int main(const int argc, char *argv[]){
     // Declaring variables
     const double EPS = 0.001;
     const double G = (double) (100.0/N);
-    double sum_x, sum_y, temp10, F_x, F_y, a_x, a_y, v1_x, v1_y, p2_x, p2_y;
+    double sum_x, sum_y, div_mass, F_x, F_y, a_x, a_y, v1_x, v1_y, p2_x, p2_y;
     double start_time, time_taken;
 
     // Starting the timer
     start_time = get_wall_seconds();
 
-    //Initializing tree
-
     
     // Implementing the algorithm
     for(n = 0; n < nsteps; n++){
-        printf("Step %d\n",n);
+        //printf("Step %d\n",n);
         qt *head = (qt*) malloc(sizeof(qt));
         create_tree(head,0.0,0.0,1.0,1.0,p,N);
 
@@ -254,16 +205,15 @@ int main(const int argc, char *argv[]){
 
             // Summing as long as i is not equal j
             SumInForce(i, EPS, &sum_x, &sum_y, p, head,theta);
-            // Calculating the forces of particle i
-            //printf("sum_x = %lf, sum_y = %lf\n");
+
+            // Calculating the forces of particle i           
             F_x = -G * p[i].mass * sum_x;
             F_y = -G * p[i].mass * sum_y;
-            //printf("Force x = %lf, x = %lf\n",F_x,F_y);
 
             // The acceleration of particle i
-            temp10 = 1.0/p[i].mass;
-            a_x = F_x * temp10;
-            a_y = F_y * temp10;
+            div_mass = 1.0/p[i].mass;
+            a_x = F_x * div_mass;
+            a_y = F_y * div_mass;
 
             // The updated velocity of particle i at step n + 1
             v1_x = delta_t * a_x;
@@ -327,7 +277,7 @@ int main(const int argc, char *argv[]){
         fwrite(&p[i].mass,            sizeof(double), 1, file_out);
         fwrite(&p[i].v_x_new,         sizeof(double), 1, file_out);
         fwrite(&p[i].v_y_new,         sizeof(double), 1, file_out);
-        fwrite(&p[i].brightness,         sizeof(double), 1, file_out);
+        fwrite(&p[i].brightness,      sizeof(double), 1, file_out);
     } 
 
     // Closing the output file
