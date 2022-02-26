@@ -1,0 +1,13 @@
+Wall times (threads = N)
+
+N = 1 : 1.512215s
+N = 2 : 1.527032s
+N = 3 : 1.529547s
+N = 4 : 1.567591s
+N = 5 : 2.027037s
+N = 6 : 2.556991s
+
+It seems to increase with 0.5 secs per extra threads over the system.
+If the number of threads is the same or fewer than the system,
+the wall time is the same. From top, i see it maxes out at
+399.7% system usage.
