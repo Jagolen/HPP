@@ -42,9 +42,9 @@ void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *hea
     }
 
     double r_x, r_y, r_vec, r_ij, num, temp1, temp2, temp3, temp4;
-    printf("EMPTY? %d\n",head->empty);
-    printf("CENTER OF MASS X = %lf, Y = %lf\n",head->center_of_mass_x,head->center_of_mass_y);
-    printf("pos_x = %lf, pos_y = %lf\n",p[i].pos_x,p[i].pos_y);
+    //printf("EMPTY? %d\n",head->empty);
+    //printf("CENTER OF MASS X = %lf, Y = %lf\n",head->center_of_mass_x,head->center_of_mass_y);
+    //printf("pos_x = %lf, pos_y = %lf\n",p[i].pos_x,p[i].pos_y);
     r_x = p[i].pos_x-head->center_of_mass_x;
     r_y = p[i].pos_y-head->center_of_mass_y;
     //printf("r_x = %lf, r_y = %lf",r_x,r_y);
@@ -52,8 +52,8 @@ void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *hea
     //printf("R_VEC = %lf\n",r_vec);
     r_ij = sqrt(r_vec);
     double theta_compare = (head->region_x_max-head->region_x_min)/r_ij;
-    printf("R_ij = %lf\n",r_ij);
-    printf("Theta = %lf, Theta_Compare = %lf\n",theta,theta_compare);
+    //printf("R_ij = %lf\n",r_ij);
+    //printf("Theta = %lf, Theta_Compare = %lf\n",theta,theta_compare);
 
     if (theta_compare>theta && (head->branch_1 != NULL || head ->branch_2 != NULL || head->branch_3 != NULL || head->branch_4 != NULL)){
     SumInForce(i,EPS,sum_x,sum_y,p,head->branch_1,theta);
@@ -66,7 +66,7 @@ void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *hea
 
     // The summation
     temp2   =  r_ij + EPS;
-    printf("Temp 2 = %lf\n",temp2);
+    //printf("Temp 2 = %lf\n",temp2);
     temp3   = temp2 *temp2;
     num     = temp2 * temp3;
     temp1   = 1.0/num;
@@ -113,7 +113,7 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
 
     //double dist = sqrt((head->center_of_mass_x-mid_width)*(head->center_of_mass_x-mid_width)+(head->center_of_mass_y-mid_height)*(head->center_of_mass_y-mid_height));
     //head->theta_check = (mid_width*2)/dist;
-    printf("Mass = %lf, Center of mass: x = %lf, y = %lf\n",head->mass,head->center_of_mass_x,head->center_of_mass_y);
+    //printf("Mass = %lf, Center of mass: x = %lf, y = %lf\n",head->mass,head->center_of_mass_x,head->center_of_mass_y);
     //printf("Particles: %d\n",numparticles);
 /*     if(numparticles < 1){
         //head = NULL;
@@ -149,7 +149,7 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
         head->branch_4 = NULL;
         if (numparticles < 1) {
             head->empty = 1;
-            printf("NODE EMPTY\n");
+            //printf("NODE EMPTY\n");
         }
         //head->particle = particle;
     }
@@ -187,7 +187,7 @@ int main(const int argc, char *argv[]){
     const int nsteps      =  atoi(argv[3]);
     const double delta_t  =  atof(argv[4]);
     const int graphics    =  atoi(argv[5]);
-    double theta       =  0;
+    double theta       =  0.2;
     
     // Graphics settings
     const float circleRadius = 0.003, circleColor = 0;
@@ -242,6 +242,7 @@ int main(const int argc, char *argv[]){
     
     // Implementing the algorithm
     for(n = 0; n < nsteps; n++){
+        printf("Step %d\n",n);
         qt *head = (qt*) malloc(sizeof(qt));
         create_tree(head,0.0,0.0,1.0,1.0,p,N);
 
