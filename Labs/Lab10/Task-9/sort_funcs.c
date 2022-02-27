@@ -25,8 +25,8 @@ void merge_sort(intType* list_to_sort, int N, int nthreads) {
   int n1 = N / 2;
   int n2 = N - n1;
   // Allocate new lists
-  intType* list1 = (intType*)malloc(n1*sizeof(intType));
-  intType* list2 = (intType*)malloc(n2*sizeof(intType));
+  intType* list1 = (intType*)malloc((n1+n2)*sizeof(intType));
+  intType* list2 = &list1[n1];
   int i;
   for(i = 0; i < n1; i++)
     list1[i] = list_to_sort[i];
@@ -68,6 +68,5 @@ void merge_sort(intType* list_to_sort, int N, int nthreads) {
   while(i2 < n2)
     list_to_sort[i++] = list2[i2++];
   free(list1);
-  free(list2);
 }
 

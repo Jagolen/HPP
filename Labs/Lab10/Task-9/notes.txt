@@ -13,3 +13,12 @@ Sorting 1000000 numbers
 4 threads : 0.311s
 5 threads : 0.314s
 6 threads : 0.316s
+
+Using 1 malloc/free
+
+1 thread : 0.848s
+2 threads : 0.450s
+3 threads : 0.449s
+4 threads : 0.263s
+5 threads : 0.258s
+6 threads : 0.260d
