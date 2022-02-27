@@ -1,0 +1,4 @@
+Using only private seems to initialize the variable to zero.
+By changing this to firstprivate, it takes on the value a was
+before. Lastprivate sets the value of a outside the block
+to the final value it was inside the block.

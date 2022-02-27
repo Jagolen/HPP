@@ -1,0 +1,23 @@
+According to the summary card, sections seems to be used in a
+way to synchronize work done by the threads, i.e. first
+do some work, then synch it, then do some more work. Instead
+of having several parallel blocks.
+
+Wall times:
+1 thread : 2.876287s
+2 threads : 1.454969s
+3 threads : 1.459135s
+
+Adding an extra function
+1 thread : 4.348262s
+2 threads : 2.891502s
+3 threads : 1.466213s
+
+In practise, it appears that one thread each takes one section
+in the section block. If there are fewer threads than sections,
+the threads takes the first number of sections corresponding to
+the number of threads. Then when they are done, they take on
+the next sections in the block and so one. For example if I had
+3 sections and 2 threads, the first two sections finished at
+the same time, then after a little while, the third section 
+finished.

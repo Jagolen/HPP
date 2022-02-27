@@ -1,0 +1,9 @@
+Without -fopenmp: 2,879s
+With -fopenmp 2 th: 1,461s
+With -fopenmp 3 th: 0,985s
+With -fopenmp 4 th: 0,747s
+
+Combining parallel with for gave the correct result and same 
+times.
+
+Other loop gives different results every time.

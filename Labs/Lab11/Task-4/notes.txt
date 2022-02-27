@@ -1,0 +1,13 @@
+Default file times:
+
+1 thread : 7.467614s
+2 threads : 5.616899s
+3 threads : 4.194804s
+4 thread : 3.321663s
+10 threads : 2.053738s
+100 threads : 1.939337s
+
+Using 4 threads with sceduling:
+Static : 3.309498s
+Dynamic : 1.956936s
+Guided : 1.955573s
