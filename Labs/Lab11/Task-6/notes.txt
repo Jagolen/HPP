@@ -1,0 +1,7 @@
+Primes under 300 000
+Times
+1 thread: 5.400131s
+2 threads: 2.729377s
+3 threads: 1.835362s
+4 threads: 1.392285s
+10 threads: 1.392580s

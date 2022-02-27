@@ -1,0 +1,8 @@
+Timings
+
+1 thread : 1,173s
+2 threads : 0,595s
+3 threads : 0,402s
+4 threads : 0,313s
+
+With reduction we get the same result

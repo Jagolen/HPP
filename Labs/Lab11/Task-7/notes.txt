@@ -1,0 +1,39 @@
+Times:
+
+Case A: N = 80 000, M = 80
+1 thread
+real	0m2,129s
+user	0m2,120s
+sys	    0m0,008s
+
+
+4 threads
+real	0m0,638s
+user	0m2,225s
+sys	    0m0,005s
+
+Case B: N = 800, M = 8 000
+1 thread
+real	0m3,872s
+user	0m3,841s
+sys	    0m0,030s
+
+
+4 threads
+real	0m1,060s
+user	0m3,911s
+sys	    0m0,012s
+
+Case C: N = 8, M = 800 000
+1 thread
+real	0m2,093s
+user	0m2,082s
+sys	    0m0,011s
+
+
+4 threads
+real	0m9,478s
+user	0m36,914s
+sys	    0m0,004s
+
+
