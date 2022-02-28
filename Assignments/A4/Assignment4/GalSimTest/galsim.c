@@ -5,6 +5,7 @@
 #include <sys/time.h>
 #include <math.h>
 #include "graphics.h"
+#include <omp.h>
 
 
 
@@ -16,6 +17,7 @@ static double get_wall_seconds() {
     return seconds;
 }
 
+omp_lock_t lock;
 
 typedef struct galsim{
     double pos_x, pos_y;	
@@ -36,7 +38,7 @@ typedef struct quadtree{
 vec *p;
 
 // The function for the summation in the formula for the force
-void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *head,double theta){
+void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *head,double theta, int threads){
     if(head->empty == 1){
         return;
     }
@@ -46,28 +48,53 @@ void SumInForce(int i, double EPS, double *sum_x, double *sum_y, vec *p ,qt *hea
     r_y = p[i].pos_y-head->center_of_mass_y;
     r_vec = (r_x * r_x) + (r_y * r_y);
     r_ij = sqrt(r_vec);
-    double theta_compare = (head->region_x_max-head->region_x_min)/r_ij;
 
+    
+    double theta_compare = (head->region_x_max-head->region_x_min)/r_ij;
+    omp_init_lock(&lock);
     if (theta_compare>theta && (head->branch_1 != NULL || head ->branch_2 != NULL || head->branch_3 != NULL || head->branch_4 != NULL)){
-        SumInForce(i,EPS,sum_x,sum_y,p,head->branch_1,theta);
-        SumInForce(i,EPS,sum_x,sum_y,p,head->branch_2,theta);
-        SumInForce(i,EPS,sum_x,sum_y,p,head->branch_3,theta);
-        SumInForce(i,EPS,sum_x,sum_y,p,head->branch_4,theta);
+        if(threads<9999999){
+            SumInForce(i,EPS,sum_x,sum_y,p,head->branch_1,theta,1);
+            SumInForce(i,EPS,sum_x,sum_y,p,head->branch_2,theta,1);
+            SumInForce(i,EPS,sum_x,sum_y,p,head->branch_3,theta,1);
+            SumInForce(i,EPS,sum_x,sum_y,p,head->branch_4,theta,1);
+        }
+        else
+            
+            #pragma omp parallel sections num_threads(4) firstprivate(i, sum_x, sum_y)
+            {
+                #pragma omp section 
+                    SumInForce(i,EPS,sum_x,sum_y,p,head->branch_1,theta,threads/4);
+                
+                #pragma omp section
+                    SumInForce(i,EPS,sum_x,sum_y,p,head->branch_2,theta,threads/4);
+
+                #pragma omp section
+                    SumInForce(i,EPS,sum_x,sum_y,p,head->branch_3,theta,threads/4);
+                
+                #pragma omp section
+                    SumInForce(i,EPS,sum_x,sum_y,p,head->branch_4,theta,threads/4);
+            }
+
     }
     else{
     
 
     // The summation
+    omp_set_lock(&lock);
     r_eps   =  r_ij + EPS;
     num     = r_eps * r_eps * r_eps;
     num_div   = 1.0/num;
     sum   = num_div * head->mass;
+    
     *sum_x += sum * r_x;
     *sum_y += sum * r_y;
+    omp_unset_lock(&lock);
     }
+    omp_destroy_lock(&lock);
 }
 
-void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y, vec *particles, int N){
+void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y, vec *particles, int N, int threads){
     head->region_x_min = min_x;
     head->region_y_min = min_y;
     head->region_x_max = max_x;
@@ -76,7 +103,6 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
     head->center_of_mass_x = 0;
     head->center_of_mass_y = 0;
     head->empty = 0;
-
     int numparticles = 0;
     double mid_width = (max_x-min_x)/2, mid_height = (max_y-min_y)/2;
     double sum_x = 0;
@@ -93,19 +119,102 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
     head->center_of_mass_y = sum_y/head->mass;
 
     if(numparticles > 1){
-        qt *sub1 = (qt*) malloc(sizeof(qt));
-        qt *sub2 = (qt*) malloc(sizeof(qt));
-        qt *sub3 = (qt*) malloc(sizeof(qt));
-        qt *sub4 = (qt*) malloc(sizeof(qt));
-        head->branch_1 = sub1;
-        head->branch_2 = sub2;
-        head->branch_3 = sub3;
-        head->branch_4 = sub4;
-        create_tree(head->branch_1, min_x,           min_y+mid_height, max_x-mid_width, max_y,            particles, N);
-        create_tree(head->branch_2, min_x+mid_width, min_y+mid_height, max_x,           max_y,            particles, N);
-        create_tree(head->branch_3, min_x,           min_y,            max_x-mid_width, max_y-mid_height, particles, N);
-        create_tree(head->branch_4, min_x+mid_width, min_y,            max_x,           max_y-mid_height, particles, N);
+        if(threads < 4){
+            qt *sub1 = (qt*) malloc(sizeof(qt));
+            qt *sub2 = (qt*) malloc(sizeof(qt));
+            qt *sub3 = (qt*) malloc(sizeof(qt));
+            qt *sub4 = (qt*) malloc(sizeof(qt));
+            head->branch_1 = sub1;
+            head->branch_2 = sub2;
+            head->branch_3 = sub3;
+            head->branch_4 = sub4;
+            create_tree(head->branch_1, min_x,           min_y+mid_height, max_x-mid_width, max_y,            particles, N, 1);
+            create_tree(head->branch_2, min_x+mid_width, min_y+mid_height, max_x,           max_y,            particles, N, 1);
+            create_tree(head->branch_3, min_x,           min_y,            max_x-mid_width, max_y-mid_height, particles, N, 1);
+            create_tree(head->branch_4, min_x+mid_width, min_y,            max_x,           max_y-mid_height, particles, N, 1);
+        }
+        else{
+            #pragma omp parallel sections num_threads(4)
+            {
+                #pragma omp section
+                    {   
+                        qt *sub1 = (qt*) malloc(sizeof(qt));
+                        double min_x_1;
+                        double min_y_1;
+                        double max_x_1;
+                        double max_y_1;
+                        #pragma omp critical
+                        {
+                        head->branch_1 = sub1;
+                        min_x_1 = min_x;
+                        min_y_1 = min_y+mid_height;
+                        max_x_1 = max_x-mid_width;
+                        max_y_1 = max_y;
+                        }
+                        create_tree(head->branch_1, min_x_1, min_y_1, max_x_1, max_y_1, particles, N, threads/4);
+                    }
+                
+                #pragma omp section
+                    {
+                        qt *sub2 = (qt*) malloc(sizeof(qt));
+                        double min_x_2;
+                        double min_y_2;
+                        double max_x_2;
+                        double max_y_2;
+
+                        #pragma omp critical
+                        {
+                            head->branch_2 = sub2;
+                            min_x_2 = min_x+mid_width;
+                            min_y_2 = min_y+mid_height;
+                            max_x_2 = max_x;
+                            max_y_2 = max_y;
+                        }
+
+                        create_tree(head->branch_2, min_x_2, min_y_2, max_x_2, max_y_2, particles, N, threads/4);
+                    }
+                
+                #pragma omp section
+                    {   
+                        qt *sub3 = (qt*) malloc(sizeof(qt));
+                        double min_x_3;
+                        double min_y_3;
+                        double max_x_3;
+                        double max_y_3;
+
+                        #pragma omp critical
+                        {
+                            head->branch_3 = sub3;
+                            min_x_3 = min_x;
+                            min_y_3 = min_y;
+                            max_x_3 = max_x-mid_width;
+                            max_y_3 = max_y-mid_height;
+                        }
+                        create_tree(head->branch_3, min_x_3, min_y_3, max_x_3, max_y_3, particles, N, threads/4);
+                    }
+                
+                #pragma omp section
+                    {   
+                        qt *sub4 = (qt*) malloc(sizeof(qt));
+                        double min_x_4;
+                        double min_y_4;
+                        double max_x_4;
+                        double max_y_4;
+
+                        #pragma omp critical
+                        {
+                            head->branch_4 = sub4;
+                            min_x_4 = min_x+mid_width;
+                            min_y_4 = min_y;
+                            max_x_4 = max_x;
+                            max_y_4 = max_y-mid_height;
+                        }                        
+                        create_tree(head->branch_4, min_x_4, min_y_4, max_x_4, max_y_4, particles, N, threads/4);
+                    }
+            }
+        }
     }
+
     else{
         head->branch_1 = NULL;
         head->branch_2 = NULL;
@@ -117,12 +226,38 @@ void create_tree(qt *head,double min_x, double min_y, double max_x, double max_y
     }
 }
 
-void delete_tree(qt **head){
+void delete_tree(qt **head,int threads){
     if(*head == NULL) return;
-    delete_tree(&((*head)->branch_1));
-    delete_tree(&((*head)->branch_2));
-    delete_tree(&((*head)->branch_3));
-    delete_tree(&((*head)->branch_4));
+    if(threads < 4){
+        delete_tree(&((*head)->branch_1),1);
+        delete_tree(&((*head)->branch_2),1);
+        delete_tree(&((*head)->branch_3),1);
+        delete_tree(&((*head)->branch_4),1);
+    }
+    else{
+        #pragma omp parallel sections num_threads(4)
+        {
+            #pragma omp section
+            {
+                delete_tree(&((*head)->branch_1),threads/4);
+            }
+
+            #pragma omp section
+            {
+                delete_tree(&((*head)->branch_2),threads/4);
+            }
+
+            #pragma omp section
+            {
+                delete_tree(&((*head)->branch_3), threads/4);
+            }
+
+            #pragma omp section
+            {
+                delete_tree(&((*head)->branch_4), threads/4);
+            }
+        }
+    }
     free(*head);
     *head=NULL;
 }
@@ -187,6 +322,9 @@ int main(const int argc, char *argv[]){
     const double G = (double) (100.0/N);
     double sum_x, sum_y, div_mass, F_x, F_y, a_x, a_y, v1_x, v1_y, p2_x, p2_y;
     double start_time, time_taken;
+    int threads = 8;
+
+    omp_set_nested(1);
 
     // Starting the timer
     start_time = get_wall_seconds();
@@ -196,15 +334,17 @@ int main(const int argc, char *argv[]){
     for(n = 0; n < nsteps; n++){
         //printf("Step %d\n",n);
         qt *head = (qt*) malloc(sizeof(qt));
-        create_tree(head,0.0,0.0,1.0,1.0,p,N);
-
+        create_tree(head,0.0,0.0,1.0,1.0,p,N,threads);
+        //printf("Tree created\n");
         for(i = 0; i < N; i++){
             // Initialize the sum variables
             sum_x = 0;
             sum_y = 0;
 
             // Summing as long as i is not equal j
-            SumInForce(i, EPS, &sum_x, &sum_y, p, head,theta);
+            //printf("doing sum in force (N = %d)\n",i);
+            SumInForce(i, EPS, &sum_x, &sum_y, p, head,theta,threads);
+            //printf("sum in force done\n");
 
             // Calculating the forces of particle i           
             F_x = -G * p[i].mass * sum_x;
@@ -244,7 +384,7 @@ int main(const int argc, char *argv[]){
         }
         //printf("Innan DELETE_TREE (Step %d)\n",n);
         qt **set_null = &head;
-        delete_tree(set_null);
+        delete_tree(set_null,threads);
         *set_null = NULL;
         free(head);
         //printf("EFTER DELETE_TREE)\n");
