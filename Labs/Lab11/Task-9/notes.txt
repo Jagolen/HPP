@@ -1,0 +1,20 @@
+Serial :
+Fib(45) = 1134903170
+
+real	0m6,648s
+user	0m6,639s
+sys	    0m0,009s
+
+Parallel (4 cores) :
+Fib(45) = 1134903170
+
+real	0m3,160s
+user	0m8,219s
+sys	    0m0,004s
+
+Parallel (16 cores) :
+Fib(45) = 1134903170
+
+real	0m2,346s
+user	0m8,244s
+sys	    0m0,004s

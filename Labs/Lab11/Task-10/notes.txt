@@ -1,0 +1,18 @@
+Serial :
+N = 500000
+totCount = 72
+finalSum = 211500005670000.000000
+
+real	0m16,446s
+user	0m16,445s
+sys	    0m0,000s
+
+Parallel :
+N = 500000
+totCount = 72
+finalSum = 211500005670000.000000
+
+real	0m8,338s
+user	0m16,659s
+sys	    0m0,000s
+

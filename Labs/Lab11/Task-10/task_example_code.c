@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <omp.h>
 
 /* The function f is doing some computations based on its input and
    storing the result in the place pointed to by resultPtr. */
@@ -29,7 +30,14 @@ int main(int argc, char *argv[]) {
   double resultVec[totCount];
 
   int count = 0;
+
+  #pragma omp parallel num_threads(16)
+  {
+    #pragma omp single
+    {
     for(int i = 0; i < 2; i++)
+      #pragma omp task
+      {
       for(int j = 0; j < 3; j++)
 	for(int k = 0; k < 2; k++)
 	  for(int l = 0; l < 3; l++)
@@ -37,7 +45,9 @@ int main(int argc, char *argv[]) {
 	      f(i, j, k, l, m, N, &resultVec[count]);
 	      count++;
 	    }
-
+    }
+    }
+  }
   assert(count == totCount);
 
   double finalSum = 0;

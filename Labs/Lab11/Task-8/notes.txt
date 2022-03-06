@@ -1,0 +1,9 @@
+Serial :
+real	0m0,558s
+user	0m0,558s
+sys	    0m0,000s
+
+Parallel :
+real	0m0,144s
+user	0m0,566s
+sys	    0m0,000s
