@@ -5,10 +5,10 @@ which then creates 2 threads each, leading to 4 threads in the
 inner loop, as expected.
 
 main file Wall seconds
-Sorting 1000000 numbers
+Sorting 1 000 000 numbers
 
 1 thread : 1.046s
-2 threads : 0.056s
+2 threads : 0.560s
 3 threads : 0.557s
 4 threads : 0.311s
 5 threads : 0.314s
