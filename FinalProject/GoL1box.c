@@ -62,10 +62,35 @@ void setup(const int argc, char *argv[], tile **board,int w, int h, int *min_x, 
             board[x][y].Cell = 1;
 
             //Determining min and max coordinates
-            if(x<*min_x) *min_x = x;
-            if(x>*max_x) *max_x = x;
-            if(y<*min_y) *min_y = y;
-            if(y>*max_y) *max_y = y;
+            if(x+w<*min_x) *min_x = x+w;
+            if(x+w>*max_x) *max_x = x+w;
+            if(y+h<*min_y) *min_y = y+h;
+            if(y+h>*max_y) *max_y = y+h;
+        }
+        
+        /*
+        When min and max x and y has been determined, we know that we only have to look at cells
+        inside and directly adjacent to these values, i.e. we need to look at cells with coordinates
+        x_min-1 <= x <= x_max+1 and same in the y direction. If x_max-x_min > width - 2 it means that
+        we will check the same cell multiple times, since the board wraps around. In that case, we just check
+        the whole board i.e from x = 0 to x = width-1 and same in the y direction.
+        */
+        if((*max_x)-(*min_x)>w-2){
+            *min_x = w;
+            *max_x = w*2-1;
+        }
+        else{
+            *min_x = *min_x-1;
+            *max_x = *max_x+1;
+        }
+
+        if((*max_y)-(*min_y)>h-2){
+            *min_y = h;
+            *max_y = h*2-1;
+        }
+        else{
+            *min_y = *min_y-1;
+            *max_y = *max_y+1;
         }
 
         //Closing the file
@@ -144,20 +169,19 @@ int main(const int argc, char *argv[]){
     }
     
     //Determining the max and min coordinates of the alive cells to be set in the setup function (Only the cells inside this and the ones directly adjacent to the border needs to be measured)
-    int min_x = width+1;
-    int max_x = -1;
-    int min_y = height+1;
-    int max_y = -1;
+    int min_x = width*2+1;
+    int max_x = width-1;
+    int min_y = height*2+1;
+    int max_y = width-1;
 
     // INITIAL CONFIGURATION
     setup(argc, argv, board, width, height, &min_x, &max_x, &min_y, &max_y);
     if(graphics_interval != -1) graphics(board,width,height,0);
-    
-
     // The algorithm
     for (long s = 0; s<steps; s++){
-        for(int i = 0; i<width; i++){
-            for(int j = 0; j<height; j++){
+        printf("Min x = %d, max x = %d, min y = %d, max y = %d\n",min_x,max_x,min_y,max_y);
+        for(int i = min_x; i<=max_x; i++){
+            for(int j = min_y; j<=max_y; j++){
                 //Variable for checking how many neighbors a cell has
                 int neighbors = 0;
                 
@@ -166,14 +190,17 @@ int main(const int argc, char *argv[]){
                 e.g a cell furthest left on the board will have a cell
                 furthest right as a neighbor
                 */
-                neighbors += board[(i-1+width)%width][(j-1+height)%height].Cell;
-                neighbors += board[(i-1+width)%width][(j+height)%height].Cell;
-                neighbors += board[(i-1+width)%width][(j+1+height)%height].Cell;
-                neighbors += board[(i+width)%width][(j-1+height)%height].Cell;
-                neighbors += board[(i+width)%width][(j+1+height)%height].Cell;
-                neighbors += board[(i+1+width)%width][(j-1+height)%height].Cell;
-                neighbors += board[(i+1+width)%width][(j+height)%height].Cell;
-                neighbors += board[(i+1+width)%width][(j+1+height)%height].Cell;
+               printf("Neighbor of (%d,%d) are: (%d, %d), (%d, %d),(%d, %d),(%d, %d),(%d, %d),(%d, %d),(%d, %d),(%d, %d)\n",i%width,j%height,(i-1)%width,(j-1)%height,(i-1)%width,j%height,(i-1)%width,(j+1)%height,i%width,(j-1)%height,i%width,(j+1)%height,(i+1)%width,(j-1)%height,(i+1)%width,j%height,(i+1)%width,(j+1)%height);
+                neighbors += board[(i-1)%width][(j-1)%height].Cell;
+                neighbors += board[(i-1)%width][j%height].Cell;
+                neighbors += board[(i-1)%width][(j+1)%height].Cell;
+                neighbors += board[i%width][(j-1)%height].Cell;
+                neighbors += board[i%width][(j+1)%height].Cell;
+                neighbors += board[(i+1)%width][(j-1)%height].Cell;
+                neighbors += board[(i+1)%width][j%height].Cell;
+                neighbors += board[(i+1)%width][(j+1)%height].Cell;
+
+                printf("Neighbors = %d\n",neighbors);
                 //The cases
 
                 /*
@@ -181,24 +208,58 @@ int main(const int argc, char *argv[]){
                 The cellbuffer must be used so that the board doesn't change until all
                 cell states has been calculated
                 */
-                if(board[i][j].Cell == 1){
-                    if(neighbors < 2 || neighbors > 3) board[i][j].Cellbuffer = 0;
-                    else board[i][j].Cellbuffer = 1;
+                if(board[i%width][j%height].Cell == 1){
+                    if(neighbors < 2 || neighbors > 3) board[i%width][j%height].Cellbuffer = 0;
+                    else board[i%width][j%height].Cellbuffer = 1;
                 }
 
                 //A dead cell becomes alive if it has exactly 3 neighbors
                 else{
-                    if(neighbors == 3) board[i][j].Cellbuffer = 1;
-                    else board[i][j].Cellbuffer = 0;
+                    if(neighbors == 3) board[i%width][j%height].Cellbuffer = 1;
+                    else board[i%width][j%height].Cellbuffer = 0;
                 }
             }
         }
+        
+        //Variables to determine the new min and max x and y
+        int min_x_temp = width*2+1;
+        int max_x_temp = width-1;
+        int min_y_temp = height*2+1;
+        int max_y_temp = height-1;
+
 
         //When all cell states for the next step has been calculated, the cells are updated
         for(int i = 0; i<width; i++){
             for(int j = 0; j<height;j++){
                 board[i][j].Cell = board[i][j].Cellbuffer;
+
+                //We look for min and max x and y positions of active cells
+                if(board[i][j].Cell == 1){
+                    if(i<min_x_temp) min_x_temp = i+width;
+                    if(i>max_x_temp) max_x_temp = i+width;
+                    if(j<min_y_temp) min_y_temp = j+height;
+                    if(j>max_x_temp) max_y_temp = j+height;
+                }
             }
+        }
+
+        //Set the new range to search for cells
+        if((max_x_temp)-(min_x_temp)>width-2){
+            min_x = width;
+            max_x = width*2-1;
+        }
+        else{
+            min_x = min_x_temp-1;
+            max_x = max_x_temp+1;
+        }
+
+        if(max_y_temp-min_y_temp>height-2){
+            min_y = height;
+            max_y = height*2-1;
+        }
+        else{
+            min_y = min_y_temp-1;
+            max_y = max_y_temp+1;
         }
 
         //Check if the board for this step should be displayed
