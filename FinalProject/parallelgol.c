@@ -1,4 +1,4 @@
-/* GAME OF LIFE SIMULATION BY JAKOB GÖLÉN */
+//GAME OF LIFE SIMULATION BY JAKOB GÖLÉN
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,7 +21,11 @@ static inline void graphics(tile **board, int w, int h, long s){
     //Shows which step we are on
     printf("\nStep %ld",s);
 
-    //Goes through the board and prints a filled square if the cell is alive or an empty square if the cell is dead
+    /*
+    Goes through the board and prints a filled square if the cell is alive or an empty 
+    square if the cell is dead. Because we need to print each box in sequence, we can't
+    parallelize this.
+    */
     for(int i = 0; i<w; i++){
         printf("\n");
         for(int j = 0; j<h; j++){
@@ -33,8 +37,8 @@ static inline void graphics(tile **board, int w, int h, long s){
     //usleep(500000);
 }
 
-//Function setting the initial condition
-void setup(const int argc, char *argv[], tile **board,int w, int h, int *min_x, int *max_x, int *min_y, int *max_y){
+//Function setting the initial condition. The function is to complicated to use inline
+static void setup(const int argc, char *argv[], tile **board,int w, int h, int *min_x, int *max_x, int *min_y, int *max_y){
     if(argc == 7){//If a file was provided as input
         FILE *input;
         char filename[60];
@@ -50,54 +54,77 @@ void setup(const int argc, char *argv[], tile **board,int w, int h, int *min_x, 
         //Reading the input file
         int saved_cells;
         fread(&saved_cells, sizeof(int), 1, input);
+        
+        //Temp variables for min and max x and y, since we can't use reduction on pointers
+        int min_x_temp = w*2+1;
+        int max_x_temp = w-1;
+        int min_y_temp = h*2+1;
+        int max_y_temp = h-1;
 
-        for (int i = 0; i<saved_cells; i++){
-            int x,y;
-            fread(&x, sizeof(int), 1, input);
-            fread(&y, sizeof(int),1, input);
-            if(x >= w || y >= h || x<0 || y<0){
-                printf("Error: Coordinates in file are outside the board\n");
-                exit(-1);
+        /*
+        We can read the file in parallel. Then, we find min and max x and y using the
+        reduction clause in openmp, one for the max values and one for the min values.
+        */
+        #pragma omp parallel for schedule(static) reduction(min:min_x_temp, min_y_temp) reduction(max:max_x_temp, max_y_temp)
+            for (int i = 0; i<saved_cells; i++){
+                int x,y;
+
+                /*This is needed so that each thread reads two values in sequence, otherwise
+                some active cells are not initialized
+                */
+                #pragma omp critical
+                {
+                fread(&x, sizeof(int), 1, input);
+                fread(&y, sizeof(int), 1, input);
+                }
+                if(x >= w || y >= h || x<0 || y<0){
+                    printf("Error: Coordinates in file are outside the board\n");
+                    exit(-1);
+                }
+                board[x][y].Cell = 1;
+
+                //Determining min and max coordinates
+                if(x+w<min_x_temp) min_x_temp = x+w;
+                if(x+w>max_x_temp) max_x_temp = x+w;
+                if(y+h<min_y_temp) min_y_temp = y+h;
+                if(y+h>max_y_temp) max_y_temp = y+h;
             }
-            board[x][y].Cell = 1;
-
-            //Determining min and max coordinates
-            if(x+w<*min_x) *min_x = x+w;
-            if(x+w>*max_x) *max_x = x+w;
-            if(y+h<*min_y) *min_y = y+h;
-            if(y+h>*max_y) *max_y = y+h;
-        }
         
         /*
         When min and max x and y has been determined, we know that we only have to look at cells
         inside and directly adjacent to these values, i.e. we need to look at cells with coordinates
         x_min-1 <= x <= x_max+1 and same in the y direction. If x_max-x_min > width - 2 it means that
         we will check the same cell multiple times, since the board wraps around. In that case, we just check
-        the whole board i.e from x = 0 to x = width-1 and same in the y direction.
+        the whole board i.e from x = 0 to x = width-1 and similar in the y direction.
         */
-        if((*max_x)-(*min_x)>w-2){
+        if((max_x_temp)-(min_x_temp)>w-2){
             *min_x = w;
             *max_x = w*2-1;
         }
         else{
-            *min_x = *min_x-1;
-            *max_x = *max_x+1;
+            *min_x = min_x_temp-1;
+            *max_x = max_x_temp+1;
         }
 
-        if((*max_y)-(*min_y)>h-2){
+        if((max_y_temp)-(min_y_temp)>h-2){
             *min_y = h;
             *max_y = h*2-1;
         }
         else{
-            *min_y = *min_y-1;
-            *max_y = *max_y+1;
+            *min_y = min_y_temp-1;
+            *max_y = max_y_temp+1;
         }
 
         //Closing the file
         fclose(input);
         return;
     }
-    //If there is no input file, a manual setup is required
+
+    /*
+    If there is no input file, a manual setup is required. The manual setup is not parallized since it
+    requires the user to manually type out the starting coordinates, and is therefore slow regardless of
+    parallelization
+    */
     printf("MANUAL INITIAL CONFIGURATION\n");
 
     //Set up file and filename
@@ -174,16 +201,21 @@ int main(const int argc, char *argv[]){
     }
 
     //Setting the input parameters
-    int width = atoi(argv[1]);
-    int height = atoi(argv[2]);
-    long steps = atol(argv[3]);
-    int graphics_interval = atoi(argv[4]);
+    const int width = atoi(argv[1]);
+    const int height = atoi(argv[2]);
+    const long steps = atol(argv[3]);
+    const int graphics_interval = atoi(argv[4]);
+    const int threads = atoi(argv[5]);
 
-    //Creating the board
+    //Setting the number of threads that will be used
+    omp_set_num_threads(threads);
+
+    //Creating the board in parallel
     tile **board = (tile**)malloc(width*sizeof(tile*));
-    for(int i=0; i<width; i++){
-        board[i] = (tile*)malloc(height*sizeof(tile));
-    }
+    #pragma omp parallel for
+        for(int i=0; i<width; i++){
+            board[i] = (tile*)malloc(height*sizeof(tile));
+        }
 
     //Setting all cells to zero
     for(int i=0; i<width; i++){
@@ -204,48 +236,52 @@ int main(const int argc, char *argv[]){
     if(graphics_interval != -1) graphics(board,width,height,0);
     // The algorithm
     for (long s = 0; s<steps; s++){
-        //printf("Min x = %d, max x = %d, min y = %d, max y = %d\n",min_x,max_x,min_y,max_y);
-        for(int i = min_x; i<=max_x; i++){
-            for(int j = min_y; j<=max_y; j++){
-                //Variable for checking how many neighbors a cell has
-                int neighbors = 0;
-                
-                /*Checking all the neighbors. I add the width/height 
-                and then take the remainder in order to have a wrap around effect
-                e.g a cell furthest left on the board will have a cell
-                furthest right as a neighbor
-                */
-               //printf("Neighbor of (%d,%d) are: (%d, %d), (%d, %d),(%d, %d),(%d, %d),(%d, %d),(%d, %d),(%d, %d),(%d, %d)\n",i%width,j%height,(i-1)%width,(j-1)%height,(i-1)%width,j%height,(i-1)%width,(j+1)%height,i%width,(j-1)%height,i%width,(j+1)%height,(i+1)%width,(j-1)%height,(i+1)%width,j%height,(i+1)%width,(j+1)%height);
-                neighbors += board[(i-1)%width][(j-1)%height].Cell;
-                neighbors += board[(i-1)%width][j%height].Cell;
-                neighbors += board[(i-1)%width][(j+1)%height].Cell;
-                neighbors += board[i%width][(j-1)%height].Cell;
-                neighbors += board[i%width][(j+1)%height].Cell;
-                neighbors += board[(i+1)%width][(j-1)%height].Cell;
-                neighbors += board[(i+1)%width][j%height].Cell;
-                neighbors += board[(i+1)%width][(j+1)%height].Cell;
 
-                //printf("Neighbors = %d\n",neighbors);
-                //The cases
+        /*
+        Since each cell doesn't change during the neighbor check, we can parallelize it!
+        The load balance is static, i.e. the computational cost doesn't change for different
+        cells since we check 8 neighbors every time, the static schedule is optimal
+        */
+        #pragma omp parallel for num_threads(threads)
+            for(int i = min_x; i<=max_x; i++){
+                for(int j = min_y; j<=max_y; j++){
+                    
+                    //Variable for checking how many neighbors a cell has
+                    int neighbors = 0;
+                    
+                    /*Checking all the neighbors. I add the width/height 
+                    and then take the remainder in order to have a wrap around effect
+                    e.g a cell furthest left on the board will have a cell
+                    furthest right as a neighbor
+                    */
+                    neighbors += board[(i-1)%width][(j-1)%height].Cell;
+                    neighbors += board[(i-1)%width][j%height].Cell;
+                    neighbors += board[(i-1)%width][(j+1)%height].Cell;
+                    neighbors += board[i%width][(j-1)%height].Cell;
+                    neighbors += board[i%width][(j+1)%height].Cell;
+                    neighbors += board[(i+1)%width][(j-1)%height].Cell;
+                    neighbors += board[(i+1)%width][j%height].Cell;
+                    neighbors += board[(i+1)%width][(j+1)%height].Cell;
+                    
+                    //The cases
 
-                /*
-                An alive cell dies if it has less than 2 or more than 3 neighbors
-                The cellbuffer must be used so that the board doesn't change until all
-                cell states has been calculated
-                */
-                if(board[i%width][j%height].Cell == 1){
-                    if(neighbors < 2 || neighbors > 3) board[i%width][j%height].Cellbuffer = 0;
-                    else board[i%width][j%height].Cellbuffer = 1;
+                    /*
+                    An alive cell dies if it has less than 2 or more than 3 neighbors
+                    The cellbuffer must be used so that the board doesn't change until all
+                    cell states has been calculated
+                    */
+                    if(board[i%width][j%height].Cell == 1){
+                        if(neighbors < 2 || neighbors > 3) board[i%width][j%height].Cellbuffer = 0;
+                        else board[i%width][j%height].Cellbuffer = 1;
+                    }
+
+                    //A dead cell becomes alive if it has exactly 3 neighbors
+                    else{
+                        if(neighbors == 3) board[i%width][j%height].Cellbuffer = 1;
+                        else board[i%width][j%height].Cellbuffer = 0;
+                    }
                 }
-
-                //A dead cell becomes alive if it has exactly 3 neighbors
-                else{
-                    if(neighbors == 3) board[i%width][j%height].Cellbuffer = 1;
-                    else board[i%width][j%height].Cellbuffer = 0;
-                }
-                //printf("%d\n",board[i%width][j%height].Cellbuffer);
             }
-        }
         
         //Variables to determine the new min and max x and y
         int min_x_temp = width*2+1;
@@ -254,22 +290,30 @@ int main(const int argc, char *argv[]){
         int max_y_temp = height-1;
 
 
-        //When all cell states for the next step has been calculated, the cells are updated
-        for(int i = min_x; i<=max_x; i++){
-            for(int j = min_y; j<=max_y;j++){
-                board[i%width][j%height].Cell = board[i%width][j%height].Cellbuffer;
-                //printf("(%d, %d) = %d\n",i%width,j%height,board[i%width][j%height].Cell);
+        /*
+        When all cell states for the next step has been calculated, the cells are updated
+        Again, updating a cell doesn't depend on another cell, since we only check the
+        buffer and value of the current cell. We also do not have a load balance issue,
+        so we use schedule(static). As in the setup, reduction is used to parallelize
+        the calculation of min and max x and y.
+        */
+        #pragma omp parallel for reduction(min: min_x_temp, min_y_temp) reduction(max:max_x_temp, max_y_temp) num_threads(threads)
+            for(int i = min_x; i<=max_x; i++){
+                for(int j = min_y; j<=max_y;j++){
 
-                //We look for min and max x and y positions of active cells
-                if(board[i%width][j%height].Cell == 1){
-                    //printf("i = %d, j = %d\n",i%width,j%height);
-                    if(i<min_x_temp) min_x_temp = i;
-                    if(i>max_x_temp) max_x_temp = i;
-                    if(j<min_y_temp) min_y_temp = j;
-                    if(j>max_y_temp) max_y_temp = j;
+                    int tempi = i%width;
+                    int tempj = j%height;
+                    board[tempi][tempj].Cell = board[tempi][tempj].Cellbuffer;
+
+                    //We look for min and max x and y positions of active cells
+                    if(board[tempi][tempj].Cell == 1){
+                        if(i<min_x_temp) min_x_temp = i;
+                        if(i>max_x_temp) max_x_temp = i;
+                        if(j<min_y_temp) min_y_temp = j;
+                        if(j>max_y_temp) max_y_temp = j;
+                    }
                 }
             }
-        }
 
         //Set the new range to search for cells
         if(max_x_temp-min_x_temp>width-2){
@@ -301,10 +345,11 @@ int main(const int argc, char *argv[]){
     //Final configuration
     if(graphics_interval != -1) graphics(board,width,height,steps);
 
-    //Freeing the memory used for the board
-    for(int i=0; i<width; i++){
-        free(board[i]);
-    }
+    //Freeing the memory used for the board in parallel
+    #pragma omp parallel for
+        for(int i=0; i<width; i++){
+            free(board[i]);
+        }
     free(board);
 
     return 0;
