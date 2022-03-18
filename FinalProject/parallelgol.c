@@ -35,10 +35,10 @@ static inline void graphics(tile **board, int w, int h, long s){
 
 //Function setting the initial condition
 void setup(const int argc, char *argv[], tile **board,int w, int h, int *min_x, int *max_x, int *min_y, int *max_y){
-    if(argc == 6){//If a file was provided as input
+    if(argc == 7){//If a file was provided as input
         FILE *input;
         char filename[60];
-        strcpy(filename, argv[5]);
+        strcpy(filename, argv[6]);
 
         //Opening the input file
         input = fopen(filename,"r");
@@ -168,8 +168,8 @@ void setup(const int argc, char *argv[], tile **board,int w, int h, int *min_x, 
 
 
 int main(const int argc, char *argv[]){
-    if (argc != 5 && argc !=6){
-        printf("Input width and height (as integers), steps to run, how often to show the board (0 to only show starting and final configuration or -1 to turn off graphics) and initial configuration (exclude this if you don't have an input file for manual setup)\n");
+    if (argc != 6 && argc !=7){
+        printf("Input width and height (as integers), steps to run, how often to show the board (0 to only show starting and final configuration or -1 to turn off graphics), number of threads and initial configuration (exclude this if you don't have an input file for manual setup)\n");
         return -1;
     }
 

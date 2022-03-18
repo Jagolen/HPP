@@ -50,6 +50,10 @@ void setup(const int argc, char *argv[], tile **board,int w, int h, int *min_x, 
         //Reading the input file
         int saved_cells;
         fread(&saved_cells, sizeof(int), 1, input);
+        int temp_x_min = w/2-1;
+        int temp_x_max = 3*w/2 +1;
+        int temp_y_min = h/2-1;
+        int temp_y_max = 3*h/2+1;
 
         for (int i = 0; i<saved_cells; i++){
             int x,y;
@@ -66,8 +70,26 @@ void setup(const int argc, char *argv[], tile **board,int w, int h, int *min_x, 
             if(x+w>*max_x) *max_x = x+w;
             if(y+h<*min_y) *min_y = y+h;
             if(y+h>*max_y) *max_y = y+h;
+            if(x+w/2<temp_x_min) temp_x_min = x+w/2;
+            if(x+w/2>temp_x_max) temp_x_max = x+w/2;
+            if(y+h/2<temp_y_min) temp_y_min = y+h/2;
+            if(y+h/2>temp_y_max) temp_y_max = y+h/2;
         }
-        
+        int xdiff = (*max_x)-(*min_x);
+        int ydiff = (*max_y)-(*min_y);
+        int xtempdiff = temp_x_max-temp_x_min;
+        int ytempdiff = temp_y_max-temp_y_min;
+
+        if(xtempdiff < xdiff){
+            *max_x = temp_x_max;
+            *min_x = temp_x_min;
+        }
+        if(ytempdiff < ydiff){
+            *max_y = temp_y_max;
+            *min_y = temp_y_min;
+        }
+
+
         /*
         When min and max x and y has been determined, we know that we only have to look at cells
         inside and directly adjacent to these values, i.e. we need to look at cells with coordinates
@@ -252,6 +274,10 @@ int main(const int argc, char *argv[]){
         int max_x_temp = width-1;
         int min_y_temp = height*2+1;
         int max_y_temp = height-1;
+        int min_x_temp2 = 3*width/2+1;
+        int max_x_temp2 = width/2-1;
+        int min_y_temp2 = 3*height/2+1;
+        int max_y_temp2 = height/2-1;
 
 
         //When all cell states for the next step has been calculated, the cells are updated
@@ -261,14 +287,33 @@ int main(const int argc, char *argv[]){
                 //printf("(%d, %d) = %d\n",i%width,j%height,board[i%width][j%height].Cell);
 
                 //We look for min and max x and y positions of active cells
-                if(board[i%width][j%height].Cell == 1){
+                if(board[i%width][j%height].Cellbuffer == 1){
                     //printf("i = %d, j = %d\n",i%width,j%height);
                     if(i<min_x_temp) min_x_temp = i;
                     if(i>max_x_temp) max_x_temp = i;
                     if(j<min_y_temp) min_y_temp = j;
                     if(j>max_y_temp) max_y_temp = j;
+                    if(i<min_x_temp2) min_x_temp2 = i;
+                    if(i>max_x_temp2) max_x_temp2 = i;
+                    if(j<min_y_temp2) min_y_temp2 = j;
+                    if(j>max_y_temp2) max_y_temp2 = j;
                 }
             }
+        }
+
+        int xdiff = max_x_temp-min_x_temp;
+        int ydiff = max_y_temp-min_y_temp;
+        int xdiff2 = max_x_temp2-min_x_temp2;
+        int ydiff2 = max_y_temp2-min_y_temp2;
+
+        if(xdiff2<xdiff){
+            min_x_temp = min_x_temp2;
+            max_x_temp = max_x_temp2;
+        }
+
+        if(ydiff2<ydiff){
+            min_y_temp = min_y_temp2;
+            max_y_temp = max_y_temp2;
         }
 
         //Set the new range to search for cells
