@@ -65,7 +65,7 @@ static void setup(const int argc, char *argv[], tile **board,int w, int h, int *
         We can read the file in parallel. Then, we find min and max x and y using the
         reduction clause in openmp, one for the max values and one for the min values.
         */
-        #pragma omp parallel for schedule(static) reduction(min:min_x_temp, min_y_temp) reduction(max:max_x_temp, max_y_temp)
+        #pragma omp parallel for reduction(min:min_x_temp, min_y_temp) reduction(max:max_x_temp, max_y_temp)
             for (int i = 0; i<saved_cells; i++){
                 int x,y;
 
@@ -239,8 +239,6 @@ int main(const int argc, char *argv[]){
 
         /*
         Since each cell doesn't change during the neighbor check, we can parallelize it!
-        The load balance is static, i.e. the computational cost doesn't change for different
-        cells since we check 8 neighbors every time, the static schedule is optimal
         */
         #pragma omp parallel for num_threads(threads)
             for(int i = min_x; i<=max_x; i++){
@@ -293,8 +291,7 @@ int main(const int argc, char *argv[]){
         /*
         When all cell states for the next step has been calculated, the cells are updated
         Again, updating a cell doesn't depend on another cell, since we only check the
-        buffer and value of the current cell. We also do not have a load balance issue,
-        so we use schedule(static). As in the setup, reduction is used to parallelize
+        buffer and value of the current cell. As in the setup, reduction is used to parallelize
         the calculation of min and max x and y.
         */
         #pragma omp parallel for reduction(min: min_x_temp, min_y_temp) reduction(max:max_x_temp, max_y_temp) num_threads(threads)
@@ -340,6 +337,37 @@ int main(const int argc, char *argv[]){
         }
     }
 
+    //Lastly we write to file
+    FILE *final;
+    int alive = 0;
+    final = fopen("output.gol","w");
+
+    //First we check how many alive cells there are on the board
+    #pragma omp parallel for reduction (+:alive) num_threads(threads)
+        for(int i = min_x; i<max_x; i++){
+            for(int j = min_y; j<max_y; j++){
+                if(board[i%width][j%height].Cell == 1) alive +=1;
+            }
+        }
+    
+    fwrite(&alive,sizeof(int),1,final);
+
+    //Then we write the positions of the alive cells to the output file
+    #pragma omp parallel for num_threads(threads)
+        for(int i = min_x; i<=max_x; i++){
+            for(int j = min_y; j<max_y; j++){
+                if(board[i%width][j%height].Cell == 1){
+                    #pragma omp critical
+                    {
+                    int tempi = i%width;
+                    int tempj = j%height;
+                    fwrite(&tempi,sizeof(int),1,final);
+                    fwrite(&tempj,sizeof(int),1,final);
+                    }
+                }
+            }
+        }
+    fclose(final);
 
 
     //Final configuration
