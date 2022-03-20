@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <omp.h>
-#include <unistd.h>
 
 
 // Struct representing the tiles on the board and determines if the tile is alive or dead
@@ -34,7 +33,6 @@ static inline void graphics(tile **board, int w, int h, long s){
         }
     }
     printf("\n");
-    //usleep(500000);
 }
 
 //Function setting the initial condition. The function is to complicated to use inline
