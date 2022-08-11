@@ -15,4 +15,5 @@ int main()
     }
     printf("Welcome to the first Lab of the HPP course!\n");
     printf("sum = %f\n",sum);
+    printf("Size of double = %ld\n", sizeof(double));
 }
