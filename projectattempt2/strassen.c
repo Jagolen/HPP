@@ -28,7 +28,117 @@ inline void matrix_subtraction(double **A, double **B, double **C, int size){
 
 //Main strassen function. It is too complicated to be inlined.
 void strassen_mult(double **A, double **B, double **C, int size){
-    
+    //Allocating memory for the submatrices, the 7 p matrices, and two temporary matrices to be used when addition is needed before multiplication
+    double **A11 = (double**)malloc(size*sizeof(double*));
+    double **A12 = (double**)malloc(size*sizeof(double*));
+    double **A21 = (double**)malloc(size*sizeof(double*));
+    double **A22 = (double**)malloc(size*sizeof(double*));
+
+    double **B11 = (double**)malloc(size*sizeof(double*));
+    double **B12 = (double**)malloc(size*sizeof(double*));
+    double **B21 = (double**)malloc(size*sizeof(double*));
+    double **B22 = (double**)malloc(size*sizeof(double*));
+
+    double **C11 = (double**)malloc(size*sizeof(double*));
+    double **C12 = (double**)malloc(size*sizeof(double*));
+    double **C21 = (double**)malloc(size*sizeof(double*));
+    double **C22 = (double**)malloc(size*sizeof(double*));
+
+    double **P1 = (double**)malloc(size*sizeof(double*));
+    double **P2 = (double**)malloc(size*sizeof(double*));
+    double **P3 = (double**)malloc(size*sizeof(double*));
+    double **P4 = (double**)malloc(size*sizeof(double*));
+    double **P5 = (double**)malloc(size*sizeof(double*));
+    double **P6 = (double**)malloc(size*sizeof(double*));
+    double **P7 = (double**)malloc(size*sizeof(double*));
+
+    double **temp1 = (double**)malloc(size*sizeof(double*));
+    double **temp2 = (double**)malloc(size*sizeof(double*));
+
+    for(int i = 0; i<size; i++){
+        A11[i] = (double*)malloc(size*sizeof(double));
+        A12[i] = (double*)malloc(size*sizeof(double));
+        A21[i] = (double*)malloc(size*sizeof(double));
+        A22[i] = (double*)malloc(size*sizeof(double));
+
+        B11[i] = (double*)malloc(size*sizeof(double));
+        B12[i] = (double*)malloc(size*sizeof(double));
+        B21[i] = (double*)malloc(size*sizeof(double));
+        B22[i] = (double*)malloc(size*sizeof(double));
+
+        C11[i] = (double*)malloc(size*sizeof(double));
+        C12[i] = (double*)malloc(size*sizeof(double));
+        C21[i] = (double*)malloc(size*sizeof(double));
+        C22[i] = (double*)malloc(size*sizeof(double));
+
+        P1[i] = (double*)malloc(size*sizeof(double));
+        P2[i] = (double*)malloc(size*sizeof(double));
+        P3[i] = (double*)malloc(size*sizeof(double));
+        P4[i] = (double*)malloc(size*sizeof(double));
+        P5[i] = (double*)malloc(size*sizeof(double));
+        P6[i] = (double*)malloc(size*sizeof(double));
+        P7[i] = (double*)malloc(size*sizeof(double));
+
+        temp1[i] = (double*)malloc(size*sizeof(double));
+        temp2[i] = (double*)malloc(size*sizeof(double));
+    }
+
+
+
+
+    //Freeing the used memory
+    for(int i = 0; i<size; i++){
+        free(A11[i]);
+        free(A12[i]);
+        free(A21[i]);
+        free(A22[i]);
+
+        free(B11[i]);
+        free(B12[i]);
+        free(B21[i]);
+        free(B22[i]);
+
+        free(C11[i]);
+        free(C12[i]);
+        free(C21[i]);
+        free(C22[i]);
+
+        free(P1[i]);
+        free(P2[i]);
+        free(P3[i]);
+        free(P4[i]);
+        free(P5[i]);
+        free(P6[i]);
+        free(P7[i]);
+
+        free(temp1[i]);
+        free(temp2[i]);
+    }
+    free(A11);
+    free(A12);
+    free(A21);
+    free(A22);
+
+    free(B11);
+    free(B12);
+    free(B21);
+    free(B22);
+
+    free(C11);
+    free(C12);
+    free(C21);
+    free(C22);
+
+    free(P1);
+    free(P2);
+    free(P3);
+    free(P4);
+    free(P5);
+    free(P6);
+    free(P7);
+
+    free(temp1);
+    free(temp2);
 }
 
 
@@ -81,7 +191,7 @@ int main(const char argc, char* argv[]){
     fclose(input);
 
     //Calling the main strassen function
-    strassen_mult(A, B, C, size);
+    strassen_mult(A, B, C, size/2);
 
 //TEST
 /*     printf("A = \n");
