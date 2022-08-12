@@ -8,6 +8,29 @@ By Jakob Gölén
 #include <string.h>
 
 
+//Function for adding two matrices, since it is repeatedly used in the function, inlined
+inline void matrix_addition(double **A, double **B, double **C, int size){
+    for(int i = 0; i<size; i++){
+        for(int j = 0; j<size; j++){
+            C[i][j] = A[i][j] + B[i][j];
+        }
+    }
+}
+
+//Function for subtracting two matrices, since it is repeatedly used in the function, inlined
+inline void matrix_subtraction(double **A, double **B, double **C, int size){
+    for(int i = 0; i<size; i++){
+        for(int j = 0; j<size; j++){
+            C[i][j] = A[i][j] - B[i][j];
+        }
+    }
+}
+
+//Main strassen function. It is too complicated to be inlined.
+void strassen_mult(double **A, double **B, double **C, int size){
+    
+}
+
 
 int main(const char argc, char* argv[]){
     if(argc != 2){
@@ -56,6 +79,9 @@ int main(const char argc, char* argv[]){
         }
     }
     fclose(input);
+
+    //Calling the main strassen function
+    strassen_mult(A, B, C, size);
 
 //TEST
 /*     printf("A = \n");
