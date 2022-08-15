@@ -7,6 +7,25 @@ By Jakob Gölén
 #include <stdlib.h>
 #include <string.h>
 
+
+//Function for adding two matrices, since it is repeatedly used in the function, inlined
+static inline void matrix_addition(double **A, double **B, double **C, int size){
+    for(int i = 0; i<size; i++){
+        for(int j = 0; j<size; j++){
+            C[i][j] = A[i][j] + B[i][j];
+        }
+    }
+}
+
+//Function for subtracting two matrices, since it is repeatedly used in the function, inlined
+static inline void matrix_subtraction(double **A, double **B, double **C, int size){
+    for(int i = 0; i<size; i++){
+        for(int j = 0; j<size; j++){
+            C[i][j] = A[i][j] - B[i][j];
+        }
+    }
+}
+
 //Main strassen function. It is too complicated to be inlined.
 static void strassen_mult(double **A, double **B, double **C, int size){
 
@@ -16,11 +35,12 @@ static void strassen_mult(double **A, double **B, double **C, int size){
     }
     else{
         int rest = size%2;
-
+        printf("Rest = %d\n", rest);
         //Matrix size is divisible by 2
         if(rest == 0){
             size = size/2;
         }
+
         //Matrix size is not divisible by 2, pad with one row and column
         else{
             size = (size+1)/2;
@@ -179,96 +199,53 @@ static void strassen_mult(double **A, double **B, double **C, int size){
 
         /*Calculating M1 = (A11+A22)*(B11+B22) by first saving the addition in the two temp matrices and then recusively performing Strassen's 
         algorithm for the multiplication*/
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                temp1[i][j] = A11[i][j] + A22[i][j];
-                temp2[i][j] = B11[i][j] + B22[i][j];
-            }
-        }                   
+
+        
+        matrix_addition(A11, A22, temp1, size);
+        matrix_addition(B11, B22, temp2, size);
         strassen_mult(temp1, temp2, M1, size);
 
         //Calculating M2 = (A21+A22)*B11
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                temp1[i][j] = A21[i][j] + A22[i][j];
-            }
-        }                   
+        matrix_addition(A21, A22, temp1, size);
         strassen_mult(temp1, B11, M2, size);
 
         //Calculating M3 = A11*(B12-B22)
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                temp1[i][j] = B12[i][j] - B22[i][j];
-            }
-        }                   
+        matrix_subtraction(B12, B22, temp1, size);
         strassen_mult(A11, temp1, M3, size);
 
         //Calculating M4 = A22*(B21-B11)
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                temp1[i][j] = B21[i][j] - B11[i][j];
-            }
-        }                   
+        matrix_subtraction(B21, B11, temp1, size);
         strassen_mult(A22, temp1, M4, size);
 
         //Calculating M5 = (A11+A12)*B22
-
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                temp1[i][j] = A11[i][j] + A12[i][j];
-            }
-        }                   
+        matrix_addition(A11,A12,temp1,size);
         strassen_mult(temp1, B22, M5, size);
 
         //Calculating M6 = (A21-A11)*(B11+B12)
-
-
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                temp1[i][j] = A21[i][j] - A11[i][j];
-                temp2[i][j] = B11[i][j] + B12[i][j];
-            }
-        }                   
+        matrix_subtraction(A21, A11, temp1, size);
+        matrix_addition(B11, B12, temp2, size);
         strassen_mult(temp1, temp2, M6, size);
 
         //Calculating M7 = (A12-A22)*(B21+B22)
-
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                temp1[i][j] = A12[i][j] - A22[i][j];
-                temp2[i][j] = B21[i][j] + B22[i][j];
-            }
-        }                   
+        matrix_subtraction(A12,A22, temp1, size);
+        matrix_addition(B21, B22, temp2, size);
         strassen_mult(temp1, temp2, M7, size);
 
         //Calculating C11 = M1 + M4 - M5 + M7
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                C11[i][j] = M1[i][j] + M4[i][j] - M5[i][j] + M7[i][j];
-            }
-        }                   
+        matrix_addition(M1, M4, temp1, size);
+        matrix_subtraction(temp1, M5, temp2, size);
+        matrix_addition(temp2, M7, C11, size);
 
         //Calculating C12 = M3 + M5
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                C12[i][j] = M3[i][j] + M5[i][j];
-            }
-        }                   
+        matrix_addition(M3, M5, C12, size);
 
         //Calculating C21 = M2 + M4
-
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                C21[i][j] = M2[i][j] + M4[i][j];
-            }
-        }                   
+        matrix_addition(M2, M4, C21, size);
 
         //Calculating C22 = M1 - M2 + M3 + M6
-        for(int i = 0; i<size; i++){
-            for(int j = 0; j<size; j++){
-                C22[i][j] = M1[i][j] - M2[i][j] + M3[i][j] + M6[i][j];
-            }
-        }                   
+        matrix_subtraction(M1, M2, temp1, size);
+        matrix_addition(temp1, M3, temp2, size);
+        matrix_addition(temp2, M6, C22, size);
 
         //Merging the C submatrices into C, if C was divisible by 2
         if(rest == 0){
@@ -447,7 +424,7 @@ int main(const char argc, char* argv[]){
 
 
     //TEST
-/*     printf("A = \n");
+    printf("A = \n");
     for(int i = 0; i<size; i++){
         for(int j = 0; j<size; j++){
             printf("%lf ", A[i][j]);
@@ -461,20 +438,20 @@ int main(const char argc, char* argv[]){
             printf("%lf ", B[i][j]);
         }
         printf("\n");
-    } */
+    }
 
 
 
     //Calling the main strassen function
     strassen_mult(A, B, C, size);
 
-/*     printf("C = \n");
+    printf("C = \n");
     for(int i = 0; i<size; i++){
         for(int j = 0; j<size; j++){
             printf("%lf ", C[i][j]);
         }
         printf("\n");
-    } */
+    }
 
 
 //Freeing the matrices
