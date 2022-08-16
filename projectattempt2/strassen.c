@@ -398,14 +398,18 @@ static void strassen_mult(double **A, double **B, double **C, int size){
 
 
 int main(const char argc, char* argv[]){
-    if(argc != 2){
-        printf("input the filename for the file containing the A and B matrices to be multiplied");
+    if(argc != 3){
+        printf("input the filename for the file containing the A and B matrices to be multiplied and the resulting output file where the C matrix is stored.\n");
         return -1;
     }
 
     //The input filename
     char filename[60];
     strcpy(filename, argv[1]);
+
+    //The output filename
+    char outname[60];
+    strcpy(outname, argv[2]);
 
     //Opening the file and reading the size of the matrices
     int size;
@@ -416,8 +420,9 @@ int main(const char argc, char* argv[]){
         printf("The following file can not be opened: %s",filename);
         exit(1);
     }
+    int read_res;
 
-    fread(&size, sizeof(int), 1, input);
+    read_res = fread(&size, sizeof(int), 1, input);
 
     //Allocating memory for the A and B matrices to be multiplied and for the C matrix where the result will be stored
 
@@ -434,13 +439,13 @@ int main(const char argc, char* argv[]){
 
     for(int i = 0; i<size; i++){
         for(int j = 0; j<size; j++){
-            fread(&A[i][j], sizeof(double), 1, input);
+            read_res = fread(&A[i][j], sizeof(double), 1, input);
         }
     }
 
     for(int i = 0; i<size; i++){
         for(int j = 0; j<size; j++){
-            fread(&B[i][j], sizeof(double), 1, input);
+            read_res = fread(&B[i][j], sizeof(double), 1, input);
         }
     }
     fclose(input);
@@ -468,6 +473,19 @@ int main(const char argc, char* argv[]){
     //Calling the main strassen function
     strassen_mult(A, B, C, size);
 
+    //Writing the output file
+    FILE *output;
+    output = fopen(outname, "w");
+    if(output == NULL){
+        printf("The following file can not be opened: %s",outname);
+        exit(1);
+    }
+    for(int i = 0; i<size; i++){
+        for(int j = 0; j<size; j++){
+            fwrite(&C[i][j], sizeof(double), 1, output);
+        }
+    }
+    fclose(output);
 /*     printf("C = \n");
     for(int i = 0; i<size; i++){
         for(int j = 0; j<size; j++){
