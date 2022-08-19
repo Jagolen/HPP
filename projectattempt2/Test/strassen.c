@@ -334,6 +334,7 @@ int main(const int argc, char* argv[]){
         printf("The following file can not be opened: %s",outname);
         exit(1);
     }
+    fwrite(&size, sizeof(int), 1, output);
     for(int i = 0; i<size; i++){
         for(int j = 0; j<size; j++){
             fwrite(&C[i*size+j], sizeof(double), 1, output);
